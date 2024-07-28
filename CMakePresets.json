@@ -1,0 +1,121 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "clang-18-toolchain",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "STRING",
+                    "value": "clang-18.cmake"
+                }
+            }
+        },
+        {
+            "name": "timing",
+            "binaryDir": "${sourceDir}/build/timing",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                },
+                "CMAKE_CXX_FLAGS_RELEASE": {
+                    "type": "STRING",
+                    "value": "-O3 -DNDEBUG -flto=auto -Wall"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "$env{HOME}/local"
+                }
+            }
+        },
+	    {
+            "name": "release",
+            "binaryDir": "${sourceDir}/build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                },
+                "CMAKE_CXX_FLAGS_RELEASE": {
+                    "type": "STRING",
+                    "value": "-O3 -Wall"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "$env{HOME}/local"
+                }
+            }
+        },
+        {
+            "name": "og",
+            "binaryDir": "${sourceDir}/build/og",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Og"
+                },
+                "CMAKE_CXX_FLAGS_OG": {
+                    "type": "STRING",
+                    "value": "-Og -g -D__SST_DEBUG_OUTPUT__ -Wall"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "$env{HOME}/local"
+                }
+            }
+        },
+        {
+            "name": "debug",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Debug"
+                },
+                "CMAKE_CXX_FLAGS_DEBUG": {
+                    "type": "STRING",
+                    "value": "-O0 -g -D__SST_DEBUG_OUTPUT__ -Wall"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "$env{HOME}/local"
+                }
+            }
+        },
+        {
+            "name": "asan",
+            "inherits": "debug",
+            "binaryDir": "${sourceDir}/build/asan",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS_DEBUG": {
+                    "type": "STRING",
+                    "value": "-O0 -g -fsanitize=address,undefined -Wall"
+                }
+            }
+        },
+        {
+            "name": "asan-og",
+            "inherits": "og",
+            "binaryDir": "${sourceDir}/build/asan-og",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS_OG": {
+                    "type": "STRING",
+                    "value": "-Og -g -fsanitize=address,undefined -Wall"
+                }
+            }
+        },
+        {
+            "name": "tidy",
+            "inherits": ["debug","clang-18-toolchain"],
+            "binaryDir": "${sourceDir}/build/tidy",
+            "cacheVariables": {
+                "CMAKE_CXX_CLANG_TIDY": {
+                    "type": "STRING",
+                    "value": "clang-tidy-17;-checks=-*,clang-analyzer-*"
+                }
+            }
+        }
+        
+    ]
+}

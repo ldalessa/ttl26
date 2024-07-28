@@ -1,0 +1,5 @@
+add_library(ttl_lib INTERFACE)
+target_include_directories(ttl_lib INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+target_compile_features(ttl_lib INTERFACE cxx_std_26)
+target_compile_options(ttl_lib INTERFACE -Wall -Werror -Wextra -pedantic)
+add_library(ttl::ttl ALIAS ttl_lib)
