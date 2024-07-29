@@ -1,11 +1,11 @@
-#include <ttl/index.hpp>
+#include <ttl/tensor_index.hpp>
 #include <ttl/formattable.hpp>
 
-constexpr ttl::index _;
-constexpr ttl::index i = "i";
-constexpr ttl::index j{"j"};
-constexpr ttl::index ij = i + j;
-constexpr ttl::index ij2 = ij + ij;
+constexpr ttl::tensor_index _;
+constexpr ttl::tensor_index i = "i";
+constexpr ttl::tensor_index j{"j"};
+constexpr ttl::tensor_index ij = i + j;
+constexpr ttl::tensor_index ij2 = ij + ij;
 
 static_assert(i == i);
 static_assert(i != j);
