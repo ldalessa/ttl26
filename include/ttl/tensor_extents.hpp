@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ttl/ARROW.hpp>
-#include <ttl/traits.hpp>
 #include <algorithm>
 #include <array>
 #include <concepts>

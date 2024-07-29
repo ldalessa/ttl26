@@ -1,8 +1,8 @@
 #pragma once
 
-#include <ttl/extents.hpp>
+#include <ttl/tensor_extents.hpp>
 #include <ttl/tensor_index.hpp>
-#include <ttl/traits.hpp>
+#include <ttl/tensor.hpp>
 #include <array>
 #include <concepts>
 #include <mdspan>
@@ -16,23 +16,24 @@ namespace ttl
     requires (std::integral<T> or std::floating_point<T>)
     struct traits<T>
     {
-        static consteval auto extents(T) -> std::extents<std::size_t> {
+        static consteval auto extents(T) noexcept -> std::extents<std::size_t> {
             return {};
         }
 
-        static constexpr auto evaluate(T const& x) -> T const& {
+        static constexpr auto evaluate(T const& x) noexcept -> T const& {
             return x;
         }
 
-        static constexpr auto evaluate(T& x) -> T& {
+        static constexpr auto evaluate(T& x) noexcept -> T& {
             return x;
         }
 
-        static constexpr auto outer() -> tensor_index<> {
+        static constexpr auto outer() noexcept -> tensor_index<> {
             return {};
         }
     };
 
+    /// Vector traits
     template <concepts::tensor T>
     struct traits<std::vector<T>>
     {
@@ -46,6 +47,7 @@ namespace ttl
             TTL_ARROW ( ttl::evaluate(x[i], j...) );
     };
 
+    /// Array traits
     template <concepts::tensor T, std::size_t N>
     struct traits<T[N]>
     {
@@ -59,9 +61,11 @@ namespace ttl
             TTL_ARROW ( ttl::evaluate(x[i], j...) );
     };
 
+    /// Constant array traits (C-arrays are weird so we need this)
     template <concepts::tensor T, std::size_t N>
-    struct traits<T const[N]> : traits<T[N]> {}; // carrays are weird
+    struct traits<T const[N]> : traits<T[N]> {};
 
+    /// Array traits
     template <concepts::tensor T, std::size_t N>
     struct traits<std::array<T, N>>
     {
@@ -75,6 +79,7 @@ namespace ttl
             TTL_ARROW ( ttl::evaluate(x[i], j...) );
     };
 
+    /// Span traits
     template <concepts::tensor T, std::size_t N>
     struct traits<std::span<T, N>>
     {
@@ -85,6 +90,12 @@ namespace ttl
             TTL_ARROW ( ttl::evaluate(x[i], j...) );
     };
 
+    /// mdspan traits
+    ///
+    /// @TODO Currently we only support mdspans with scalar element
+    /// types. There's no fundamental reason we couldn't support a tensor
+    /// element, it's just a somewhat noisy instantiation that I don't want to
+    /// write yet.
     template <concepts::scalar T, class Extents, class LayoutPolicy, class AccessorPolicy>
     struct traits<std::mdspan<T, Extents, LayoutPolicy, AccessorPolicy>>
     {

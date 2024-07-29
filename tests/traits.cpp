@@ -1,5 +1,5 @@
-#include <ttl/std_traits.hpp>
-#include <ttl/traits.hpp>
+#include <ttl/std.hpp>
+#include <ttl/tensor.hpp>
 
 using namespace ttl::concepts;
 
@@ -18,7 +18,6 @@ static constexpr bool _verify_tensor_traits = []
 template <class T>
 static constexpr bool _verify_expression_traits = []
  {
-
      static_assert(expression<T>);
      static_assert(expression<T const>);
      static_assert(expression<T&>);

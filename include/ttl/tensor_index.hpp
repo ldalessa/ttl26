@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ttl/ARROW.hpp>
-#include <ttl/traits.hpp>
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -28,7 +27,8 @@ namespace ttl
             std::ranges::copy(str, _indices);
         }
 
-        friend constexpr bool operator==(tensor_index const& a, concepts::tensor_index auto const& b) {
+        template <std::size_t M>
+        friend constexpr bool operator==(tensor_index const& a, tensor_index<M> const& b) {
             return std::ranges::equal(a, b);
         }
 
@@ -64,7 +64,8 @@ namespace ttl
         /// Check to see if a is a subset of b.
         ///
         /// @precondition a should not should not have any contracted indices
-        constexpr bool is_subset_of(concepts::tensor_index auto const& b) const
+        template <std::size_t M>
+        constexpr bool is_subset_of(tensor_index<M> const& b) const
         {
             return std::ranges::all_of(*this, [&](_char_t const c) {
                 assert(this->count(c) == 1); // shouldn't have any contracted indices
@@ -75,7 +76,8 @@ namespace ttl
         /// Check to see if a is a permutation of b.
         ///
         /// @precondition neither a nor b should have contracted indices
-        constexpr bool is_permutation_of(concepts::tensor_index auto const& b) const {
+        template <std::size_t M>
+        constexpr bool is_permutation_of(tensor_index<M> const& b) const {
             return this->is_subset_of(b) and b.is_subset_of(*this);
         }
 
@@ -104,8 +106,8 @@ namespace ttl
             return std::ranges::distance(begin(), std::ranges::find(*this, c));
         }
 
-        template <std::size_t R>
-        constexpr auto index_of(concepts::tensor_index auto const& b) const -> std::array<int, R> {
+        template <std::size_t R, std::size_t M>
+        constexpr auto index_of(tensor_index<M> const& b) const -> std::array<int, R> {
             assert(R = b.rank());
             std::array<int, R> out{};
             for (int i = 0; _char_t const c : b) {

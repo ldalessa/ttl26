@@ -1,5 +1,5 @@
-#include <ttl/std_traits.hpp>
-#include <ttl/traits.hpp>
+#include <ttl/std.hpp>
+#include <ttl/tensor.hpp>
 #include <cassert>
 #include <mdspan>
 
