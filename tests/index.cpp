@@ -45,10 +45,3 @@ static_assert(ij2.contracted() == ij);
 
 static_assert((i + i + j).exported() == j);
 static_assert((i + i + j).contracted() == i);
-
-#include <print>
-
-int main()
-{
-    std::print("{}\n", ij2);
-}

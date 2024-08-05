@@ -53,8 +53,3 @@ static_assert(_verify_tensor_traits<std::mdspan<int, std::extents<int, 1>>, 1>);
 static_assert(_verify_tensor_traits<std::mdspan<int const, std::extents<int, 1>>, 1>);
 static_assert(_verify_tensor_traits<std::mdspan<int, std::extents<int, 1, std::dynamic_extent>>, 2>);
 static_assert(_verify_tensor_traits<std::mdspan<int, std::extents<int, 1, std::dynamic_extent, 3>>, 3>);
-
-int main()
-{
-    return 0;
-}

@@ -68,8 +68,10 @@ namespace ttl
         constexpr bool is_subset_of(tensor_index<M> const& b) const
         {
             return std::ranges::all_of(*this, [&](_char_t const c) {
-                assert(this->count(c) == 1); // shouldn't have any contracted indices
-                return b.count(c) != 0;
+                switch (b.count(c)) {
+                  case 1: return true;
+                }
+                assert(false && "b should not contain repeated indices");
             });
         }
 
@@ -107,11 +109,11 @@ namespace ttl
         }
 
         template <std::size_t R, std::size_t M>
-        constexpr auto index_of(tensor_index<M> const& b) const -> std::array<int, R> {
-            assert(R = b.rank());
+        friend constexpr auto index_of(tensor_index const& self, tensor_index<M> const& b) -> std::array<int, R> {
+            assert(R == b.rank());
             std::array<int, R> out{};
             for (int i = 0; _char_t const c : b) {
-                out[i++] = index_of(c);
+                out[i++] = self.index_of(c);
             }
             return out;
         }

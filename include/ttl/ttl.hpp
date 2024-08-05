@@ -4,3 +4,4 @@
 #include <ttl/tensor.hpp>
 #include <ttl/tensor_extents.hpp>
 #include <ttl/tensor_index.hpp>
+#include <ttl/tree/bind.hpp>

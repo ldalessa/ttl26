@@ -1,4 +1,3 @@
-#include <ttl/ttl.hpp>
-#include <mdspan>
-
-auto main() -> int {}
+auto main() -> int {
+    return 0;
+}

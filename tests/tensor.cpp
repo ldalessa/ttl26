@@ -18,7 +18,7 @@ static_assert([] {
 
     static_assert(ttl::evaluate(3.1415, std::array<std::size_t, 0>{}) == 3.1415);
 
-    static_assert(ttl::extents(0) == std::extents<std::size_t>{});
+    static_assert(ttl::tensor_extents(0) == std::extents<std::size_t>{});
     return true;
  }());
 

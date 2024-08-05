@@ -23,51 +23,6 @@ namespace ttl
 
     namespace tree
     {
-        template <concepts::tensor A, index _index>
-        class bind
-        {
-            using scalar_type = ttl::scalar_type<A>;
-
-            static constexpr auto _outer = _index.exported();
-            static constexpr auto _inner = _outer + _index.contracted();
-            static constexpr auto _rank = _outer.rank();
-            static constexpr auto _map = _::index_mapper(_inner, _index);
-
-            A _a;
-
-            static consteval auto rank() -> std::size_t {
-                return _rank;
-            }
-
-            static consteval auto outer() -> decltype(_outer) {
-                return _outer;
-            }
-
-            constexpr auto extents() const
-                TTL_ARROW ( _::select(_::extents_map<_index, _outer>, ttl::extents(_a)) );
-
-
-            template <std::integral... Is>
-            requires (sizeof...(Is) == _inner.rank())
-            constexpr auto operator[](this auto& self, Is... i)
-                TTL_ARROW ( _map(self._a, i...) );
-
-            template <std::integral... Is>
-            requires (_rank <= sizeof...(Is) and sizeof...(Is) < _inner.rank())
-            constexpr auto operator[](Is... i) const noexcept(noexcept(operator[](i..., 0))) -> scalar_type
-            {
-                scalar_type sum{};
-                for (auto j = 0zu, e = _extent(i...); j != e; ++j) {
-                    sum += operator[](i..., j);
-                }
-                return sum;
-            }
-
-          private:
-            constexpr auto _extent(std::integral auto... i) const {
-                return extents().extent(sizeof...(i));
-            }
-        };
 
         template <concepts::expression A, concepts::expression B>
         struct sum

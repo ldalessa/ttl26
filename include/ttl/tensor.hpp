@@ -7,7 +7,7 @@
 ///   ttl::scalar_type<T>  is the underlying scalar type for a tensor
 ///
 /// Tensor functions:
-///   ttl::extents(t)      is the dynamic extents type for a tensor
+///   ttl::tensor_extents(t) is the dynamic extents type for a tensor
 ///   ttl::evaluate(t, i...) evaluates the tensor for a specific index
 ///
 /// Expression metafunctions:
@@ -16,6 +16,8 @@
 #pragma once
 
 #include <ttl/ARROW.hpp>
+#include <ttl/concepts.hpp>
+#include <ttl/sequence.hpp>
 #include <concepts>
 #include <cstddef>
 #include <functional>
@@ -24,40 +26,23 @@
 
 namespace ttl
 {
-    namespace concepts
-    {
-        template <class T>
-        concept tensor_index = requires {
-            typename std::remove_reference_t<T>::_tensor_index_tag_t;
-        };
-
-        template <class T>
-        concept tensor_extents = requires (T&& t) {
-            { std::remove_reference_t<T>::rank() } -> std::convertible_to<std::size_t>;
-            { t.extent(0) } -> std::convertible_to<std::size_t>;
-        };
-    }
-
-    /// Tensor traits:
-    ///   [required] traits<T>::extents(t) -> tensor_extents
-    ///   [required] traits<T const>::evaluate(t, i...)
-    ///
-    /// Expression traits:
-    ///   [required] outer<T>::outer() -> tensor_index
+    /// traits<T>::tensor_extents(t)
+    /// traits<T>::evaluate(t, i...)
+    /// traits<T>::outer()
     template <class T> struct traits;
     template <class T> struct traits<T const> : traits<T>{};
     template <class T> struct traits<T&>      : traits<T>{};
     template <class T> struct traits<T&&>     : traits<T>{};
 
-    inline constexpr struct _has_extents_fn
+    inline constexpr struct _tensor_extents_fn
     {
         template <class T>
         static constexpr auto operator()(T&& t)
-            TTL_ARROW ( traits<T>::extents(std::forward<T>(t)) );
-    } extents;
+            TTL_ARROW ( traits<T>::tensor_extents(std::forward<T>(t)) );
+    } tensor_extents;
 
     template<class T>
-    using extents_type = std::remove_reference_t<std::invoke_result_t<decltype(traits<T>::extents), T&&>>;
+    using extents_type = std::remove_reference_t<std::invoke_result_t<decltype(traits<T>::tensor_extents), T&&>>;
 
     template <class T>
     inline constexpr std::size_t rank = extents_type<T>::rank();
@@ -70,12 +55,12 @@ namespace ttl
             TTL_ARROW ( traits<T>::evaluate(std::forward<T>(t), i...) );
 
         template <class T, std::size_t N, std::size_t... i>
-        static constexpr auto operator()(T&& t, std::array<std::size_t, N> const& index, std::index_sequence<i...>)
+        static constexpr auto operator()(T&& t, std::array<std::size_t, N> const& index, sequence<i...>)
             TTL_ARROW ( operator()(std::forward<T>(t), index[i]...) );
 
         template <class T, std::size_t N>
         static constexpr auto operator()(T&& t, std::array<std::size_t, N> const& index)
-            TTL_ARROW ( operator()(std::forward<T>(t), index, std::make_index_sequence<N>()) );
+            TTL_ARROW ( operator()(std::forward<T>(t), index, seqn<N>) );
     } evaluate;
 
     template <class T>
@@ -89,7 +74,7 @@ namespace ttl
     {
         template <class T>
         concept tensor = requires (T&& t) {
-            { ttl::extents(std::forward<T>(t)) } -> tensor_extents;
+            { ttl::tensor_extents(std::forward<T>(t)) } -> tensor_extents;
             requires requires (std::array<std::size_t, ttl::rank<T>> index) {
                 ttl::evaluate(std::forward<T>(t), index);
             };
