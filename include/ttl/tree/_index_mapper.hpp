@@ -13,21 +13,28 @@
 
 namespace ttl::tree
 {
-    template <tensor_index _to>
+    template <std::size_t N>
     struct _index_mapper
     {
-        static constexpr std::size_t N = _to.size();
+        // static constexpr std::size_t N = _to.size();
 
         int _map[N]{};
 
-        template <std::size_t From>
-        constexpr _index_mapper(tensor_index<From> const& from)
+        template <std::size_t From, std::size_t To>
+        constexpr _index_mapper(tensor_index<From> const& from, tensor_index<To> const& to)
         {
-            assert(_to.is_subset_of(from));
+            assert(N == to.size());
+            assert(to.is_subset_of(from));
             int i = 0;
-            std::ranges::for_each(_to, [&](auto const c) {
+            std::ranges::for_each(to, [&](auto const c) {
                 _map[i++] = from.index_of(c);
             });
+
+            // assert(_to.is_subset_of(from));
+            // int i = 0;
+            // std::ranges::for_each(_to, [&](auto const c) {
+            //     _map[i++] = from.index_of(c);
+            // });
         }
 
         template <concepts::tensor T, std::size_t M, std::size_t... i>

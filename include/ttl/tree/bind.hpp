@@ -32,7 +32,7 @@ namespace ttl
             static constexpr auto _outer = _index.exported();
             static constexpr auto _inner = _outer + _index.contracted();
             static constexpr auto _rank = _outer.rank();
-            static constexpr auto _map = _index_mapper<_index>(_inner);
+            static constexpr auto _map = _index_mapper<_index.size()>(_inner, _index);
             static constexpr auto _outer_extents_map = _extents_map<_index, _outer>;
             static constexpr auto _inner_extents_map = _extents_map<_index, _inner>;
 
