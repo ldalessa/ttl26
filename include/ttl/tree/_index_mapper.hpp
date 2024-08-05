@@ -16,12 +16,9 @@ namespace ttl::tree
     template <std::size_t N>
     struct _index_mapper
     {
-        // static constexpr std::size_t N = _to.size();
-
         int _map[N]{};
 
-        template <std::size_t From, std::size_t To>
-        constexpr _index_mapper(tensor_index<From> const& from, tensor_index<To> const& to)
+        constexpr _index_mapper(concepts::tensor_index auto const& from, concepts::tensor_index auto const& to)
         {
             assert(N == to.size());
             assert(to.is_subset_of(from));
@@ -29,12 +26,6 @@ namespace ttl::tree
             std::ranges::for_each(to, [&](auto const c) {
                 _map[i++] = from.index_of(c);
             });
-
-            // assert(_to.is_subset_of(from));
-            // int i = 0;
-            // std::ranges::for_each(_to, [&](auto const c) {
-            //     _map[i++] = from.index_of(c);
-            // });
         }
 
         template <concepts::tensor T, std::size_t M, std::size_t... i>

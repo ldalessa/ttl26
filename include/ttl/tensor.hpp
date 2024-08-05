@@ -49,7 +49,7 @@ namespace ttl
 
     inline constexpr struct _evaluate_fn
     {
-        template <class T, std::integral... Is>
+        template <class T, concepts::size_t... Is>
         requires (sizeof...(Is) == rank<T>)
         static constexpr auto operator()(T&& t, Is... i)
             TTL_ARROW ( traits<T>::evaluate(std::forward<T>(t), i...) );

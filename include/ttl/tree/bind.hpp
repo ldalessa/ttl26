@@ -6,6 +6,7 @@
 #include <ttl/tensor.hpp>
 #include <ttl/tensor_extents.hpp>
 #include <ttl/tensor_index.hpp>
+#include <ttl/tree/_extents_map.hpp>
 #include <ttl/tree/_index_mapper.hpp>
 
 #include <concepts>
@@ -16,12 +17,6 @@ namespace ttl
 {
     namespace tree
     {
-        template <tensor_index self, tensor_index b>
-        inline constexpr sequence _extents_map = []<std::size_t... i>(sequence<i...>) {
-            static constexpr auto map = index_of<b.rank()>(self, b);
-            return sequence<map[i]...>();
-        }(seqn<b.rank()>);
-
         template <tensor_index _index, concepts::tensor A>
         struct bind
         {
