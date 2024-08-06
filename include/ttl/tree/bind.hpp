@@ -33,6 +33,10 @@ namespace ttl
 
             A _a;
 
+            constexpr bind(A a) : _a(a) {
+                assert(_check_contracted_extents() && "contracted extents have different sizes");
+            }
+
             /// The index operator forwards to _evaluate.
             ///
             /// Forwarding is necessary because, when the bind index contains a
@@ -90,6 +94,36 @@ namespace ttl
                 }
                 return sum;
             }
+
+            constexpr auto _check_contracted_extents() const -> bool
+            {
+                using Extents = decltype(auto(ttl::tensor_extents(_a)));
+
+                static constexpr auto contracted = _index.contracted();
+                static constexpr auto N = contracted.size();
+
+                static constexpr auto find_offsets = [](char const c) -> std::array<int, 2> {
+                    std::array<int, 2> out;
+                    for (int i = 0, n = 0; auto const d : _index) {
+                        if (c == d) out[n++] = i;
+                        i += 1;
+                    }
+                    return out;
+                };
+
+                auto const a_extents = ttl::tensor_extents(_a);
+
+                return [&]<std::size_t... i>(sequence<i...>) {
+                    return ([&] {
+                        constexpr auto x = find_offsets(contracted[i]);
+                        assert(x[0] != x[1]);
+                        static_assert(Extents::static_extent(x[0]) == Extents::static_extent(x[1]) or
+                                      Extents::static_extent(x[0]) == std::dynamic_extent or
+                                      Extents::static_extent(x[1]) == std::dynamic_extent);
+                        return a_extents.extent(x[0]) == a_extents.extent(x[1]);
+                    }() && ...);
+                }(seqn<N>);
+            }
         };
     }
 
@@ -114,6 +148,8 @@ namespace ttl
 
     template <tensor_index _index, concepts::tensor A>
     inline constexpr auto bind(A&& a) -> tree::bind<_index, A> {
-        return tree::bind<_index, A>{ ._a = std::forward<A>(a) };
+        // return tree::bind<_index, A>{ ._a = std::forward<A>(a) };
+        return tree::bind<_index, A>{ std::forward<A>(a) };
+
     }
 }

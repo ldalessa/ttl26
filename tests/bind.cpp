@@ -37,7 +37,8 @@ static constexpr bool test_vector()
 
 static_assert(test_vector());
 
-static constexpr bool test_matrix() {
+static constexpr bool test_matrix()
+{
     int A[3][3] = {
         {0, 1, 2},
         {3, 4, 5},
@@ -55,6 +56,20 @@ static constexpr bool test_matrix() {
     static_assert(ttl::rank<decltype(cx)> == 0);
     assert(cx[] == 12);
     assert(cx == 12);
+
+    int const B[6] = {
+        0, 1,
+        2, 3,
+        4, 5
+    };
+    auto bspan = std::mdspan(B, 3, 2);
+    auto bb = ttl::bind<ij>(bspan);
+    assert((bb[0,0] == 0));
+    assert((bb[0,1] == 1));
+    assert((bb[1,0] == 2));
+    assert((bb[1,1] == 3));
+    assert((bb[2,0] == 4));
+    assert((bb[2,1] == 5));
 
     return true;
 }

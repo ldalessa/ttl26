@@ -95,6 +95,10 @@ namespace ttl
             });
         }
 
+        constexpr auto data() const -> char const* {
+            return _indices;
+        }
+
         constexpr auto operator[](std::size_t const i) const -> _char_t {
             assert(i < size());
             return _indices[i];
