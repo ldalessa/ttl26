@@ -1,15 +1,32 @@
+#undef DNDEBUG
+
 #include <ttl/std.hpp>
 #include <ttl/tensor.hpp>
 #include <ttl/tensor_index.hpp>
 #include <ttl/tree/bind.hpp>
 #include <cassert>
 
-#undef DNDEBUG
-
 static constexpr ttl::tensor_index i = "i";
 static constexpr ttl::tensor_index j = "j";
 static constexpr ttl::tensor_index ii = i + i;
 static constexpr ttl::tensor_index ij = i + j;
+
+static constexpr bool test_scalar()
+{
+    auto x = ttl::bind(1);
+    assert(x == 1);
+    assert(x[] == 1);
+
+    int n = 1;
+    auto y = ttl::bind(n);
+    y = 2;
+    assert(n == 2);
+    y[] = 3;
+    assert(n == 3);
+    return true;
+}
+
+static_assert(test_scalar());
 
 static constexpr bool test_vector()
 {

@@ -69,6 +69,7 @@ namespace ttl
         {
             return std::ranges::all_of(*this, [&](_char_t const c) {
                 switch (b.count(c)) {
+                  case 0: return false;
                   case 1: return true;
                 }
                 assert(false && "b should not contain repeated indices");

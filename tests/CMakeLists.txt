@@ -1,3 +1,3 @@
-add_executable(test test.cpp #index.cpp traits.cpp tensor.cpp
-  bind.cpp)
+add_executable(test test.cpp index.cpp traits.cpp tensor.cpp
+  bind.cpp sum.cpp)
 target_link_libraries(test ttl::ttl)

@@ -33,7 +33,7 @@ namespace ttl
 
             A _a;
 
-            constexpr bind(A a) : _a(a) {
+            constexpr bind(A a) : _a(static_cast<A>(a)) {
                 assert(_check_contracted_extents() && "contracted extents have different sizes");
             }
 
@@ -47,9 +47,20 @@ namespace ttl
             constexpr auto operator[](this T&& self, concepts::size_t auto... i)
                 TTL_ARROW ( std::forward<T>(self)._evaluate(std::size_t(i)...) );
 
+            /// Allow assignment from scalar when this bind represents a scalar.
+            template <std::convertible_to<scalar_type> T>
+            constexpr auto operator=(T&& x) -> bind&
+                requires (_rank == 0)
+            {
+                _evaluate() = std::forward<T>(x);
+                return *this;
+            }
+
             /// If the bind represents a scalar we can implicitly convert to the
             /// scalar_type.
-            constexpr operator scalar_type() const requires (_rank == 0) {
+            constexpr operator decltype(auto)() const
+                requires (_rank == 0)
+            {
                 return _evaluate();
             }
 
@@ -78,7 +89,7 @@ namespace ttl
             template <class T, concepts::size_t... Is>
             requires (sizeof...(Is) == _inner.rank())
             constexpr auto _evaluate(this T&& self, Is... i)
-                TTL_ARROW ( _map(std::forward<T>(self)._a, std::size_t(i)...) );
+                TTL_ARROW ( _map(std::forward<T>(self)._a, i...) );
 
             /// This version of _evaluate will get called if there is a
             /// contraction in this bind (basically it's going to be a
@@ -147,9 +158,26 @@ namespace ttl
     };
 
     template <tensor_index _index, concepts::tensor A>
-    inline constexpr auto bind(A&& a) -> tree::bind<_index, A> {
-        // return tree::bind<_index, A>{ ._a = std::forward<A>(a) };
-        return tree::bind<_index, A>{ std::forward<A>(a) };
+    inline constexpr auto bind(A& a)
+    {
+        return tree::bind<_index, A&>{ a };
+    }
 
+    template <tensor_index _index, concepts::tensor A>
+    inline constexpr auto bind(A const&& a)
+    {
+        return tree::bind<_index, A const>{ std::move(a) };
+    }
+
+    template <concepts::scalar A>
+    inline constexpr auto bind(A& a)
+    {
+        return tree::bind<ttl::tensor_index{}, A&> { a };
+    }
+
+    template <concepts::scalar A>
+    inline constexpr auto bind(A const&& a)
+    {
+        return tree::bind<ttl::tensor_index{}, A const> { std::move(a) };
     }
 }

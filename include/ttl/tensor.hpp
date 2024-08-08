@@ -50,7 +50,7 @@ namespace ttl
     inline constexpr struct _evaluate_fn
     {
         template <class T, concepts::size_t... Is>
-        requires (sizeof...(Is) == rank<T>)
+        requires (rank<T> == sizeof...(Is))
         static constexpr auto operator()(T&& t, Is... i)
             TTL_ARROW ( traits<T>::evaluate(std::forward<T>(t), i...) );
 
@@ -64,7 +64,7 @@ namespace ttl
     } evaluate;
 
     template <class T>
-    using scalar_type = std::remove_cvref_t<std::invoke_result_t<_evaluate_fn, T&&, std::array<std::size_t, rank<T>>>>;
+    using scalar_type = std::remove_reference_t<std::invoke_result_t<_evaluate_fn, T&&, std::array<std::size_t, rank<T>>>>;
 
     template <class T>
     inline constexpr auto outer = traits<T>::outer();

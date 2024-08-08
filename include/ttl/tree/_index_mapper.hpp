@@ -6,6 +6,7 @@
 #include <ttl/tensor.hpp>
 #include <ttl/tensor_index.hpp>
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <concepts>
 #include <cstddef>
@@ -29,11 +30,11 @@ namespace ttl::tree
         }
 
         template <concepts::tensor T, std::size_t M, std::size_t... i>
-        constexpr auto _apply(T&& t, std::size_t const(&in)[M], sequence<i...>) const
+        constexpr auto _apply(T&& t, std::array<std::size_t, M> const &in, sequence<i...>) const
             TTL_ARROW ( ttl::evaluate(std::forward<T>(t), in[_map[i]]...) );
 
         template <concepts::tensor T, concepts::size_t... Is>
         constexpr auto operator()(T&& t, Is... is) const
-            TTL_ARROW ( _apply(std::forward<T>(t), {is...}, seqn<N>) );
+            TTL_ARROW ( _apply(std::forward<T>(t), std::array<std::size_t, sizeof...(is)>{is...}, seqn<N>) );
     };
 }
