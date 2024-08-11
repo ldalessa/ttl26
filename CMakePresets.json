@@ -96,7 +96,7 @@
             "cacheVariables": {
                 "CMAKE_CXX_CLANG_TIDY": {
                     "type": "STRING",
-                    "value": "clang-tidy-17;-checks=-*,clang-analyzer-*"
+                    "value": "clang-tidy-18;-checks=-*,clang-analyzer-*"
                 }
             }
         }
