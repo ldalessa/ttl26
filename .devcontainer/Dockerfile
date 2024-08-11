@@ -3,7 +3,7 @@ FROM debian:testing
 
 RUN apt-get update
 RUN apt-get -y full-upgrade
-RUN apt-get -y install wget curl jq lsb-release software-properties-common gnupg procps unzip ninja-build valgrind sudo
+RUN apt-get -y install wget curl jq lsb-release software-properties-common gnupg procps unzip make valgrind sudo
 
 RUN useradd -rms /bin/bash -G sudo -p "$(openssl passwd -6 devcontainer)" devcontainer
 RUN passwd -d devcontainer
@@ -17,9 +17,6 @@ RUN wget https://apt.llvm.org/llvm.sh && \
 COPY get-docker.sh get-docker.sh
 RUN sh get-docker.sh
 
-#RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
-#    sh get-docker.sh 
-
 RUN arch="$(uname -m)"; version="$(curl -s https://api.github.com/repos/Kitware/CMake/releases/latest | jq -r '.tag_name' | cut -c 2-)"; echo "Latest Version: $version" && \
     url="https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-linux-$arch.sh"; echo "Download URL: $url" && \
     wget -q $url && \
@@ -31,9 +28,3 @@ USER devcontainer
 ENV PATH="/usr/lib/llvm-18/bin:$PATH" \
     CC=clang \
     CXX=clang++
-
-
-# # unversionize the binaries
-# RUN ln -s /usr/bin/clang-${LLVM_VERSION} /usr/bin/clang && \
-#     ln -s /usr/bin/clang++-${LLVM_VERSION} /usr/bin/clang++ && \
-#     ln -s /usr/bin/clang-format-${LLVM_VERSION} /usr/bin/clang-format
