@@ -7,7 +7,7 @@
             "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "STRING",
-                    "value": "cmake/clang-18.cmake"
+                    "value": ".cmake/clang-18.cmake"
                 }
             }
         },
@@ -17,7 +17,7 @@
             "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "STRING",
-                    "value": "cmake/clang.cmake"
+                    "value": ".cmake/clang.cmake"
                 }
             }
         },
