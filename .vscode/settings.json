@@ -1,0 +1,8 @@
+{
+    "C_Cpp.autocompleteAddParentheses": true,
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "clangd.arguments": [
+        "-std=c++26 -stdlib=libc++ -Wall -Wextre -Werror -pedantic"
+    ],
+    "clangd.onConfigChanged": "restart"
+}
