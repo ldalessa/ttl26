@@ -3,10 +3,10 @@ FROM debian:testing
 
 RUN apt-get update
 RUN apt-get -y full-upgrade
-RUN apt-get -y install wget curl jq lsb-release software-properties-common gnupg procps unzip 
+RUN apt-get -y install wget curl jq lsb-release software-properties-common gnupg procps unzip ninja-build valgrind sudo
 
-# RUN useradd -rms /bin/bash -p "$(openssl passwd -6 devcontainer)" devcontainer
-# RUN passwd -d devcontainer
+RUN useradd -rms /bin/bash -G sudo -p "$(openssl passwd -6 devcontainer)" devcontainer
+RUN passwd -d devcontainer
 
 # install llvm
 RUN wget https://apt.llvm.org/llvm.sh && \
@@ -26,10 +26,11 @@ RUN arch="$(uname -m)"; version="$(curl -s https://api.github.com/repos/Kitware/
     sh cmake-$version-linux-$arch.sh --prefix=/usr/local --skip-license && \
     rm -rf cmake-$version-linux-$arch.sh
 
-# USER devcontainer
-ENV PATH="/usr/lib/llvm-18/bin" \
-   CC=clang \
-   CXX=clang++
+USER devcontainer
+
+ENV PATH="/usr/lib/llvm-18/bin:$PATH" \
+    CC=clang \
+    CXX=clang++
 
 
 # # unversionize the binaries
