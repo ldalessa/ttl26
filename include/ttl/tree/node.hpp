@@ -10,12 +10,12 @@
 
 namespace ttl::tree
 {
-    template <tensor, index_string> struct bind;
+    template <tensor, index_string>
+    struct bind;
 
-    struct node
-    {
-        /// Rebind an expression. This is implemented in bind.hpp in
-        /// order to break the circular include there.
+    struct node {
+        /// Rebind an expression. This is implemented in bind.hpp in order to
+        /// break the circular include there.
         template <class T, index_string... str>
         constexpr auto operator()(this T&& self, index<str>... is)
             -> bind<T, (str + ...)>;
@@ -29,7 +29,7 @@ namespace ttl::tree
             return __fwd(self)[ttl::index(i)...];
         }
 
-      protected:
+    protected:
         /// Check that the bounds are inside the extents.
         constexpr bool _check_bounds(this auto const& self, std::integral auto... i)
         {
@@ -42,9 +42,9 @@ namespace ttl::tree
         template <index_string index, std::size_t... es>
         static constexpr bool _check_contracted_extents(std::extents<std::size_t, es...> const& extents)
         {
-            // For each contracted index, check to make sure that
-            // the static extents we are contracting are compatible
-            // and that the actual extents are the same.
+            // For each contracted index, check to make sure that the static
+            // extents we are contracting are compatible and that the actual
+            // extents are the same.
             static constexpr auto contracted = index.contracted();
             return [&]<std::size_t... i>(std::index_sequence<i...>) {
                 return ([&] {

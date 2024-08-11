@@ -7,23 +7,24 @@
 
 namespace ttl
 {
-    template <class> struct tensor_traits;
+    template <class>
+    struct tensor_traits;
 
     inline constexpr class _evaluate_fn
     {
         template <class T, std::size_t N>
         static constexpr bool _has_trait = []<std::size_t... i>(std::index_sequence<i...>) {
-            return requires (T&& t) { tensor_traits<std::remove_reference_t<T>>::evaluate(__fwd(t), ((void)i, 0zu)...); };
+            return requires(T&& t) { tensor_traits<std::remove_reference_t<T>>::evaluate(__fwd(t), ((void)i, 0zu)...); };
         }(std::make_index_sequence<N>());
 
         template <class T, std::size_t N>
         static constexpr bool _has_member_fn = []<std::size_t... i>(std::index_sequence<i...>) {
-            return requires (T&& t) { tensor_traits<std::remove_reference_t<T>>::evaluate(__fwd(t), ((void)i, 0zu)...); };
+            return requires(T&& t) { tensor_traits<std::remove_reference_t<T>>::evaluate(__fwd(t), ((void)i, 0zu)...); };
         }(std::make_index_sequence<N>());
 
         template <class T, std::size_t N>
         static constexpr bool _has_multidimensional_index = []<std::size_t... i>(std::index_sequence<i...>) {
-            return requires (T&& t) { __fwd(t)[((void)i, 0zu)...]; };
+            return requires(T&& t) { __fwd(t)[((void)i, 0zu)...]; };
         }(std::make_index_sequence<N>());
 
         template <class T, std::size_t N>

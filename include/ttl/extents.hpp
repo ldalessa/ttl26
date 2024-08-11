@@ -7,17 +7,18 @@
 
 namespace ttl
 {
-    template <class> struct tensor_traits;
+    template <class>
+    struct tensor_traits;
 
     inline constexpr class _extents_fn
     {
         template <class T>
-        static constexpr bool _has_trait = requires (T&& t) {
+        static constexpr bool _has_trait = requires(T&& t) {
             tensor_traits<std::remove_reference_t<T>>::extents(t);
         };
 
         template <class T>
-        static constexpr bool _has_member_fn = requires (T&& t) {
+        static constexpr bool _has_member_fn = requires(T&& t) {
             t.extents();
         };
 
@@ -50,12 +51,14 @@ namespace ttl
     inline constexpr std::size_t rank = extents_type<T>::rank();
 
     template <class T>
-    inline constexpr auto extent(T&& t, std::size_t i) -> std::size_t {
+    inline constexpr auto extent(T&& t, std::size_t i) -> std::size_t
+    {
         return ttl::extents((T&&)t).extent(i);
     }
 
     template <std::size_t i, class T>
-    inline constexpr auto extent(T&& t) -> std::size_t {
+    inline constexpr auto extent(T&& t) -> std::size_t
+    {
         return ttl::extent(__fwd(t), i);
     }
 
@@ -63,19 +66,22 @@ namespace ttl
     inline constexpr auto static_extent = extents_type<T>::static_extent(i);
 
     template <class T, std::size_t... as, class U, std::size_t... bs>
-    inline constexpr auto concat_extents(std::extents<T, as...> const& a, std::extents<U, bs...> const& b) -> std::extents<std::common_type_t<T>, as..., bs...> {
+    inline constexpr auto concat_extents(std::extents<T, as...> const& a, std::extents<U, bs...> const& b) -> std::extents<std::common_type_t<T>, as..., bs...>
+    {
         return [&]<std::size_t... i, std::size_t... j>(std::index_sequence<i...>, std::index_sequence<j...>) {
             return std::extents<std::common_type_t<T, U>, as..., bs...> { a.extent(i)..., b.extent(j)... };
         }(std::make_index_sequence<sizeof...(as)>(), std::make_index_sequence<sizeof...(bs)>());
     }
 
     template <std::size_t a, class T, std::size_t... bs>
-    inline constexpr auto prepend_extent(std::extents<T, bs...> const& b, T x) {
+    inline constexpr auto prepend_extent(std::extents<T, bs...> const& b, T x)
+    {
         return concat_extents(std::extents<T, a>(x), b);
     }
 
     template <std::size_t... i, class T, std::size_t... ts>
-    inline constexpr auto select_extents(std::extents<T, ts...> const& t) {
+    inline constexpr auto select_extents(std::extents<T, ts...> const& t)
+    {
         return std::extents<T, std::extents<T, ts...>::static_extent(i)...> {
             t.extent(i)...
         };
@@ -107,6 +113,6 @@ namespace ttl
         -> std::extents<std::common_type_t<T, U>, std::min(as, bs)...>
     {
         assert(compatible_extents(a, b));
-        return std::extents<std::common_type_t<T, U>, std::min(as, bs)...>{a};
+        return std::extents<std::common_type_t<T, U>, std::min(as, bs)...> { a };
     }
 }

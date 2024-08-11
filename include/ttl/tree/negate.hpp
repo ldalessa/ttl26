@@ -1,8 +1,8 @@
 #pragma once
 
+#include <ttl/evaluate.hpp>
 #include <ttl/expression.hpp>
 #include <ttl/extents.hpp>
-#include <ttl/evaluate.hpp>
 #include <ttl/outer.hpp>
 #include <ttl/tree/node.hpp>
 
@@ -12,21 +12,22 @@
 namespace ttl::tree
 {
     template <expression A, auto op>
-    struct unary_prefix : node
-    {
+    struct unary_prefix : node {
         A _a;
 
         constexpr operator ttl::evaluate_type<A>(this auto&& self)
-            requires (ttl::rank<A> == 0)
+            requires(ttl::rank<A> == 0)
         {
             return __fwd(self)[];
         }
 
-        static constexpr auto outer() {
+        static constexpr auto outer()
+        {
             return ttl::outer<A>;
         }
 
-        constexpr auto extents() const {
+        constexpr auto extents() const
+        {
             return ttl::extents(_a);
         }
 
@@ -39,22 +40,24 @@ namespace ttl::tree
     };
 
     template <expression A>
-    struct negate : unary_prefix<A, std::negate{}> {
+    struct negate : unary_prefix<A, std::negate {}> {
         using negate::unary_prefix::unary_prefix;
     };
 
     template <expression A>
-    struct identity : unary_prefix<A, std::identity{}> {
+    struct identity : unary_prefix<A, std::identity {}> {
         using identity::unary_prefix::unary_prefix;
     };
 
     template <expression A>
-    inline constexpr auto operator-(A&& a) -> negate<A> {
+    inline constexpr auto operator-(A&& a) -> negate<A>
+    {
         return negate<A>(__fwd(a));
     }
 
     template <expression A>
-    inline constexpr auto operator+(A&& a) -> identity<A> {
+    inline constexpr auto operator+(A&& a) -> identity<A>
+    {
         return identity<A>(__fwd(a));
     }
 }

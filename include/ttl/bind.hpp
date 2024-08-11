@@ -9,12 +9,14 @@
 namespace ttl
 {
     template <scalar A>
-    inline constexpr auto bind(A& a) -> tree::bind<A&, ""> {
+    inline constexpr auto bind(A& a) -> tree::bind<A&, "">
+    {
         return tree::bind<A&, "">(a);
     }
 
     template <scalar A>
-    inline constexpr auto bind(A const&& a) -> tree::bind<A const, ""> {
+    inline constexpr auto bind(A const&& a) -> tree::bind<A const, "">
+    {
         return tree::bind<A const, "">(std::move(a));
     }
 
@@ -33,10 +35,10 @@ namespace ttl
     }
 
     template <tensor A, class... Index>
-    requires (std::integral<Index> or ...)
+        requires(std::integral<Index> or ...)
     inline constexpr auto bind(A&& a, Index const&... ids)
-        // -> decltype(bind((A&&)a, ttl::index(ids)...))
-        // https://github.com/llvm/llvm-project/issues/54440
+    // -> decltype(bind((A&&)a, ttl::index(ids)...))
+    // https://github.com/llvm/llvm-project/issues/54440
     {
         return bind((A&&)a, ttl::index(ids)...);
     }
