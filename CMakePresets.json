@@ -12,7 +12,18 @@
             }
         },
         {
+            "name": "clang-toolchain",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "STRING",
+                    "value": "cmake/clang.cmake"
+                }
+            }
+        },
+        {
             "name": "lto",
+            "inherits": "clang-toolchain",
             "binaryDir": "${sourceDir}/build/timing",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -27,6 +38,7 @@
         },
 	    {
             "name": "release",
+            "inherits": "clang-toolchain",
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -41,6 +53,7 @@
         },
         {
             "name": "og",
+            "inherits": "clang-toolchain",
             "binaryDir": "${sourceDir}/build/og",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -55,6 +68,7 @@
         },
         {
             "name": "debug",
+            "inherits": "clang-toolchain",
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -91,7 +105,7 @@
         },
         {
             "name": "tidy",
-            "inherits": ["debug","clang-18-toolchain"],
+            "inherits": "debug",
             "binaryDir": "${sourceDir}/build/tidy",
             "cacheVariables": {
                 "CMAKE_CXX_CLANG_TIDY": {
