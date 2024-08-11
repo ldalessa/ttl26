@@ -46,14 +46,15 @@ namespace ttl::tree
             // extents we are contracting are compatible and that the actual
             // extents are the same.
             static constexpr auto contracted = index.contracted();
+            static constexpr std::size_t static_extents[]{es...}; // @todo[c++26]
             return [&]<std::size_t... i>(std::index_sequence<i...>) {
                 return ([&] {
                     constexpr auto c = contracted[i];
                     constexpr auto x = index.find_offsets(c);
                     constexpr auto j = x[0];
                     constexpr auto k = x[1];
-                    constexpr auto a = extents.static_extent(j); // @todo[c++26] es...[j];
-                    constexpr auto b = extents.static_extent(k); // @todo[c++26] es...[k];
+                    constexpr auto a = static_extents[j]; // @todo[c++26] es...[j];
+                    constexpr auto b = static_extents[k]; // @todo[c++26] es...[k];
                     static_assert(a == b or a == std::dynamic_extent or b == std::dynamic_extent);
                     return extents.extent(j) == extents.extent(k);
                 }() && ...);

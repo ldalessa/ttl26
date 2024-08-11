@@ -1,5 +1,7 @@
 #pragma once
 
+#include "extents.hpp"
+
 #include <concepts>
 #include <cstddef>
 #include <type_traits>

@@ -95,7 +95,7 @@ namespace ttl::tree
         constexpr auto _remap_indices(this auto&& self, std::index_sequence<j...>, std::integral auto... i) -> ttl::evaluate_type<A>
         {
             static_assert(sizeof...(i) == _all.size());
-            int const ind[] { i... };
+            int const ind[] { int(i)... };
             return ttl::evaluate(__fwd(self)._a, ind[j]...);
             // return ttl::evaluate(__fwd(self)._a, i...[j]...); @todo[c++26]
         }
@@ -121,8 +121,8 @@ namespace ttl::tree
         /// This is called when the bind represents a contraction, and we
         /// haven't generated enough indices for that contraction yet.
         constexpr auto _evaluate(this auto&& self, std::integral auto... i) -> ttl::scalar_type<A>
+            requires (_rank <= sizeof...(i) and sizeof...(i) < _inner.size())
         {
-            static_assert(_rank <= sizeof...(i) and sizeof...(i) < _inner.size());
             auto const extents = select_extents(index_map<_index, _inner>, ttl::extents(self._a));
             accumulator_type<A> accum {};
             for (std::size_t j = 0, e = extents.extent(sizeof...(i)); j < e; ++j) {

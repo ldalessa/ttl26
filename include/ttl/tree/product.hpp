@@ -78,7 +78,7 @@ namespace ttl::tree
         {
             static_assert(sizeof...(i) == _inner.size());
 
-            int const ind[] { i... };
+            int const ind[] { int(i)... };
             return op(ttl::evaluate(_a, ind[a]...), ttl::evaluate(_b, ind[b]...));
             // return op(ttl::evaluate(_a, i...[a]...), ttl::evaluate(_b, i...[b]...)); @todo[c++26]
         }
@@ -96,9 +96,9 @@ namespace ttl::tree
         /// If we encounter this function then we have an accumulation occurring
         /// and thus we'll be returning the scalar_type.
         constexpr auto _evaluate(std::integral auto... i) const -> scalar_type
+            requires (_rank <= sizeof...(i) and sizeof...(i) < _inner.size())
         {
             static constexpr auto N = sizeof...(i);
-            static_assert(_rank <= N and N < _inner.size());
 
             // Map the extents from the concantenated extents for a.b into the
             // inner index space (the outer indices + the contracted

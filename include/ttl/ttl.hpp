@@ -7,9 +7,9 @@
 #include <ttl/outer.hpp>
 #include <ttl/tensor.hpp>
 #include <ttl/tensor_traits.hpp>
+#include <ttl/tspan.hpp>
 #include <ttl/tree/bind.hpp>
-#include <ttl/tree/expression_common.hpp>
+#include <ttl/tree/node.hpp>
 #include <ttl/tree/negate.hpp>
 #include <ttl/tree/product.hpp>
 #include <ttl/tree/sum.hpp>
-#include <ttl/tspan.hpp>
