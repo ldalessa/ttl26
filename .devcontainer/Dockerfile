@@ -3,11 +3,8 @@ FROM debian:testing
 
 RUN apt-get update
 RUN apt-get -y full-upgrade
-RUN apt-get -y install wget curl sudo make lsb-release software-properties-common gnupg jq git
-#     procps make valgrind sudo
-
-RUN useradd -rms /bin/bash -G sudo -p "$(openssl passwd -6 devcontainer)" devcontainer
-RUN passwd -d devcontainer
+RUN apt-get -y install wget sudo make valgrind git
+RUN apt-get -y install lsb-release software-properties-common gnupg # llvm.sh
 
 # install llvm
 RUN wget https://apt.llvm.org/llvm.sh && \
@@ -15,11 +12,17 @@ RUN wget https://apt.llvm.org/llvm.sh && \
     ./llvm.sh 18 all && \
     rm ./llvm.sh
 
-RUN arch="$(uname -m)"; version="$(curl -s https://api.github.com/repos/Kitware/CMake/releases/latest | jq -r '.tag_name' | cut -c 2-)"; echo "Latest Version: $version" && \
-    url="https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-linux-$arch.sh"; echo "Download URL: $url" && \
+# download and install cmake
+RUN arch="$(uname -m)"; \
+    version="3.30.2"; \
+    url="https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-linux-$arch.sh"; \
     wget -q $url && \
     sh cmake-$version-linux-$arch.sh --prefix=/usr/local --skip-license && \
-    rm -rf cmake-$version-linux-$arch.sh
+    rm cmake-$version-linux-$arch.sh
+
+
+RUN useradd -rms /bin/bash -G sudo -p "$(openssl passwd -6 devcontainer)" devcontainer
+RUN passwd -d devcontainer
 
 USER devcontainer
 

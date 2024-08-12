@@ -22,6 +22,16 @@
             }
         },
         {
+            "name": "clangd",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": {
+                    "type": "BOOL",
+                    "value": true
+                }
+            }
+        },
+        {
             "name": "lto",
             "inherits": "clang-toolchain",
             "binaryDir": "${sourceDir}/build/timing",
@@ -68,7 +78,7 @@
         },
         {
             "name": "debug",
-            "inherits": "clang-18-toolchain",
+            "inherits": "clang-toolchain",
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -105,7 +115,7 @@
         },
         {
             "name": "tidy",
-            "inherits": "debug",
+            "inherits": ["debug","clangd"],
             "binaryDir": "${sourceDir}/build/tidy",
             "cacheVariables": {
                 "CMAKE_CXX_CLANG_TIDY": {
