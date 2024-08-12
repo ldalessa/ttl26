@@ -3,6 +3,7 @@
 #include <ttl/ttl.hpp>
 #include <cassert>
 #include <array>
+#include <mdspan>
 #include <vector>
 
 template <std::size_t... i>

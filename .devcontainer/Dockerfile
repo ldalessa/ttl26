@@ -3,8 +3,8 @@ FROM debian:testing
 
 RUN apt-get update
 RUN apt-get -y full-upgrade
-RUN apt-get -y install wget curl sudo make
-#    lsb-release software-properties-common gnupg procps make valgrind sudo
+RUN apt-get -y install wget curl sudo make lsb-release software-properties-common gnupg jq git
+#     procps make valgrind sudo
 
 RUN useradd -rms /bin/bash -G sudo -p "$(openssl passwd -6 devcontainer)" devcontainer
 RUN passwd -d devcontainer

@@ -1,3 +1,7 @@
+add_executable(index index.cpp)
+target_link_libraries(index ttl::ttl)
+target_compile_options(index PRIVATE -Wall -Werror -Wextra -Wno-zero-length-array -pedantic)
+
 add_executable(tensor tspan.cpp)
 target_link_libraries(tensor ttl::ttl)
 target_compile_options(tensor PRIVATE -Wall -Werror -Wextra -Wno-zero-length-array -pedantic)

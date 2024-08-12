@@ -68,7 +68,7 @@
         },
         {
             "name": "debug",
-            "inherits": "clang-toolchain",
+            "inherits": "clang-18-toolchain",
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
