@@ -1,17 +1,6 @@
 {
-	"name": "C++",
+	"name": "ttl26",
 	"build": {
 		"dockerfile": "Dockerfile"
-	},
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"llvm-vs-code-extensions.vscode-clangd",
-				"ms-vscode.cmake-tools",
-				"llvm-vs-code-extensions.lldb-dap",
-				"ms-vscode.cpptools-extension-pack",
-				"ms-azuretools.vscode-docker"
-			]
-		}
 	}
 }
