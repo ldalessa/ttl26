@@ -4,6 +4,7 @@
 #include <ttl/index.hpp>
 #include <ttl/tensor.hpp>
 #include <ttl/tensor_traits.hpp>
+#include <ttl/tree/assign.hpp>
 
 #include <concepts>
 #include <cstddef>
@@ -71,6 +72,13 @@ namespace ttl
         {
         }
         /// @}
+
+        /// Assign from a tensor.
+        template <class A>
+        constexpr auto operator=(this A&& a, tensor auto&& b) -> decltype(a) {
+            ttl::tree::assign(__fwd(a), __fwd(b));
+            return a;
+        }
 
         /// Tensor indexing.
         ///

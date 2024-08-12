@@ -1,9 +1,9 @@
 #pragma once
 
 #include <ttl/evaluate.hpp>
-#include <ttl/expression.hpp>
 #include <ttl/extents.hpp>
 #include <ttl/outer.hpp>
+#include <ttl/tensor.hpp>
 #include <ttl/tree/node.hpp>
 
 #include <concepts>

@@ -23,10 +23,19 @@ namespace ttl::tree
         /// Rebind an expression.
         template <class T>
         constexpr auto operator()(this T&& self, is_index auto... i)
-            -> decltype(__fwd(self)[ttl::index(i)...])
+            -> decltype(__fwd(self)[index(i)...])
         {
             static_assert(sizeof...(i) == ttl::rank<T>);
-            return __fwd(self)[ttl::index(i)...];
+            return __fwd(self)[index(i)...];
+        }
+
+        /// Allow assignments of scalar expressions to automatically evaluate
+        /// their results.
+        template <class T>
+        constexpr operator decltype(std::declval<T&&>()[])(this T&& self)
+            requires requires { std::declval<T&&>()[]; }
+        {
+            return __fwd(self)[];
         }
 
     protected:

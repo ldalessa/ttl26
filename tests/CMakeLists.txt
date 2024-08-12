@@ -14,3 +14,6 @@ add_executable(main main.cpp)
 target_link_libraries(main ttl::ttl)
 target_compile_options(main PRIVATE -Wall -Werror -Wextra -Wno-zero-length-array -pedantic)
 
+add_executable(assign assign.cpp)
+target_link_libraries(assign ttl::ttl)
+target_compile_options(assign PRIVATE -Wall -Werror -Wextra -Wno-zero-length-array -pedantic)

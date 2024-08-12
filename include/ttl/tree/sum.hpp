@@ -1,9 +1,9 @@
 #pragma once
 
 #include <ttl/evaluate.hpp>
-#include <ttl/expression.hpp>
 #include <ttl/index.hpp>
 #include <ttl/outer.hpp>
+#include <ttl/tensor.hpp>
 #include <ttl/tree/node.hpp>
 
 #include <concepts>
@@ -45,13 +45,8 @@ namespace ttl::tree
 
         static constexpr auto outer()
         {
-            return _outer_a;
-        }
 
-        constexpr operator scalar_type(this sum const& self)
-            requires(_rank == 0)
-        {
-            return self[];
+            return _outer_a;
         }
 
         constexpr auto extents() const

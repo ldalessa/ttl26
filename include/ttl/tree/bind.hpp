@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ttl/expression.hpp>
 #include <ttl/extents.hpp>
 #include <ttl/index.hpp>
 #include <ttl/tensor.hpp>
+#include <ttl/tree/assign.hpp>
 #include <ttl/tree/node.hpp>
 
 #include <cassert>
@@ -33,22 +33,8 @@ namespace ttl::tree
             assert(_check_contracted_extents<_index>(ttl::extents(_a)));
         }
 
-        constexpr auto operator=(scalar_type<A> const& x) -> bind&
-            requires requires { ttl::evaluate(*this) = x; }
-        {
-            _evaluate() = x;
-            return *this;
-        }
-
-        // Can't do this because of
-        // https://github.com/llvm/llvm-project/issues/54440, must manually
-        // compute the right type.
-        //
-        // constexpr operator decltype(_evaluate())() const
-        constexpr operator std::conditional_t<_index.contracted().size() == 0, ttl::evaluate_type<A>, ttl::scalar_type<A>>() const
-            requires(_rank == 0)
-        {
-            return _evaluate();
+        constexpr auto operator=(this auto&& a, tensor auto&& b) -> decltype(auto) {
+            return assign(__fwd(a), __fwd(b));
         }
 
         static constexpr auto outer()

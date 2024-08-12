@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ttl/index.hpp>
-#include <ttl/tensor.hpp>
+#include <ttl/extents.hpp>
 
 namespace ttl
 {
@@ -11,15 +11,16 @@ namespace ttl
         struct outer {
         };
 
-        template <scalar T>
+        template <class T>
+            requires (rank<T> == 0)
         struct outer<T> {
-            static constexpr ttl::index_string value = {};
+            static constexpr index_string value = {};
         };
 
         template <class T>
-            requires(not scalar<T> and requires { std::remove_reference_t<T>::outer(); })
+            requires(rank<T> != 0 and requires { std::remove_reference_t<T>::outer(); })
         struct outer<T> {
-            static constexpr ttl::index_string value = std::remove_reference_t<T>::outer();
+            static constexpr index_string value = std::remove_reference_t<T>::outer();
         };
     }
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <ttl/evaluate.hpp>
-#include <ttl/expression.hpp>
 #include <ttl/index.hpp>
 #include <ttl/outer.hpp>
+#include <ttl/tensor.hpp>
 #include <ttl/tree/node.hpp>
 
 #include <concepts>
@@ -18,8 +18,8 @@ namespace ttl::tree
         using scalar_type = std::invoke_result_t<decltype(op), scalar_type<A>, scalar_type<B>>;
         using accumulator_type = std::remove_cvref_t<scalar_type>;
 
-        static constexpr auto _outer_a = ttl::outer<A>;
-        static constexpr auto _outer_b = ttl::outer<B>;
+        static constexpr auto _outer_a = outer<A>;
+        static constexpr auto _outer_b = outer<B>;
         static constexpr auto _outer_ab = _outer_a + _outer_b;
 
         static_assert(_outer_ab.projected().size() == 0);
@@ -45,12 +45,6 @@ namespace ttl::tree
         static constexpr auto outer()
         {
             return _outer;
-        }
-
-        constexpr operator scalar_type() const
-            requires(_rank == 0)
-        {
-            return _evaluate();
         }
 
         /// Select the extents from the a-b concatenated extents that correspond
@@ -79,8 +73,8 @@ namespace ttl::tree
             static_assert(sizeof...(i) == _inner.size());
 
             int const ind[] { int(i)... };
-            return op(ttl::evaluate(_a, ind[a]...), ttl::evaluate(_b, ind[b]...));
-            // return op(ttl::evaluate(_a, i...[a]...), ttl::evaluate(_b, i...[b]...)); @todo[c++26]
+            return op(evaluate(_a, ind[a]...), evaluate(_b, ind[b]...));
+            // return op(evaluate(_a, i...[a]...), evaluate(_b, i...[b]...)); @todo[c++26]
         }
 
         /// Forward to the inner evaluation, passing the appropriate maps.
