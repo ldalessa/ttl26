@@ -77,7 +77,17 @@ static constexpr bool _tensors()
     assert((K[0,1] = X[0] * Y[1]));
     assert((K[1,1] = X[1] * Y[1]));
 
-    // X += Y(i);
+    X += Y(i);
+    assert(x[0] == 6);
+    assert(x[1] == 8);
+
+    X(i) += y;
+    assert(x[0] == 10);
+    assert(x[1] == 13);
+
+    X -= Y(i);
+    assert(x[0] == 6);
+    assert(x[1] == 8);
 
     return true;
 }

@@ -53,34 +53,47 @@ namespace ttl::tree
         return ttl::bind(__fwd(self), is...);
     }
 
-    // template <index_string ind, class A>
-    // inline constexpr auto autobind(A&& a) -> decltype(ttl::bind(__fwd(a), index<ind>()));
+    template <index_string ind, class A>
+    inline constexpr auto autobind(A&& a) -> decltype(ttl::bind(__fwd(a), index<ind>()))
+    {
+        return ttl::bind(__fwd(a), index<ind>());
+    }
 
-    // template <tensor A, tensor B>
-    // inline constexpr auto operator+(A&&, B&&);
+    template <tensor A, tensor B>
+    inline constexpr auto operator+(A&&, B&&);
 
-    // template <tensor A, expression B>
-    // inline constexpr auto operator+(A&& a, B&& b) -> decltype(autobind<outer<B>>(__fwd(a)) + __fwd(b));
-    //-> decltype(ttl::bind(__fwd(a), index<outer<B>>{}) + __fwd(b));
-    //  {
-    //     return ttl::bind(__fwd(a), index<outer<B>>{}) + __fwd(b);
-    // }
+    template <tensor A, expression B>
+    inline constexpr auto operator+(A&& a, B&& b)
+    // @todo[clang bug]
+    // -> decltype(autobind<outer<B>>(__fwd(a)) + __fwd(b));
+    {
+        return autobind<outer<B>>(__fwd(a)) + __fwd(b);
+    }
 
-    // template <expression A, tensor B>
-    // inline constexpr auto operator+(A&& a, B&& b) -> decltype(__fwd(a) + ttl::bind(__fwd(b), index<outer<A>>())) {
-    //     return __fwd(a) + ttl::bind(__fwd(b), index<outer<A>>());
-    // }
+    template <expression A, tensor B>
+    inline constexpr auto operator+(A&& a, B&& b) 
+    // @todo[clang bug]
+    // -> decltype(__fwd(a) + ttl::bind(__fwd(b), index<outer<A>>())) 
+    {
+        return __fwd(a) + autobind<outer<A>>(__fwd(b));
+    }
 
-    // template <tensor A, tensor B>
-    // inline constexpr auto operator-(A&&, B&&);
+    template <tensor A, tensor B>
+    inline constexpr auto operator-(A&&, B&&);
 
-    // template <tensor A, expression B>
-    // inline constexpr auto operator-(A&& a, B&& b) -> decltype(ttl::bind(__fwd(a), outer<B>) + __fwd(b)) {
-    //     return ttl::bind(__fwd(a), outer<B>) + __fwd(b);
-    // }
+    template <tensor A, expression B>
+    inline constexpr auto operator-(A&& a, B&& b)
+    // @todo[clang bug]
+    // -> decltype(autobind<outer<B>>(__fwd(a)) - __fwd(b));
+    {
+        return autobind<outer<B>>(__fwd(a)) - __fwd(b);
+    }
 
-    // template <expression A, tensor B>
-    // inline constexpr auto operator-(A&& a, B&& b) -> decltype(__fwd(a) + ttl::bind(__fwd(b), outer<A>)) {
-    //     return __fwd(a) + ttl::bind(__fwd(b), outer<A>);
-    // }
+    template <expression A, tensor B>
+    inline constexpr auto operator-(A&& a, B&& b) 
+    // @todo[clang bug]
+    // -> decltype(__fwd(a) + ttl::bind(__fwd(b), index<outer<A>>())) 
+    {
+        return __fwd(a) - autobind<outer<A>>(__fwd(b));
+    }
 }

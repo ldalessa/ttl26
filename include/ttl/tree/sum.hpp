@@ -67,9 +67,15 @@ namespace ttl::tree
         template <std::size_t... i>
         static constexpr auto _evaluate(auto&& x, std::index_sequence<i...>, std::integral auto... j)
         {
-            int const ind[] { j... };
-            return ttl::evaluate(__fwd(x), ind[i]...);
             // return ttl::evaluate(__fwd(x), j...[i]...); @todo[c++26]
+            if constexpr (sizeof...(j) != 0)
+            {
+                std::common_type_t<decltype(j)...> const js[] { j... };
+                return ttl::evaluate(__fwd(x), js[i]...);
+            }
+            else {
+                return ttl::evaluate(__fwd(x));
+            }
         }
     };
 
