@@ -59,6 +59,13 @@ namespace ttl
         {
             return __fwd(t)[i...];
         }
+
+        /// Workaround a clang-18 bug wrt using lambdas in concepts.
+        template <class T, std::size_t... i>
+        constexpr auto _check_clang18(this auto self, T&& t, std::index_sequence<i...>) -> decltype(self(__fwd(t), i...))
+        {
+            return self(__fwd(t), i...);
+        }
     } evaluate;
 
     template <class T>

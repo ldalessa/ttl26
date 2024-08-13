@@ -26,6 +26,15 @@ static constexpr bool _scalars()
     m = B(i, i);
     assert(n == 2);
 
+    m += B(i, i);
+    assert(n == 4);
+
+    m -= B(i, i);
+    assert(n == 2);
+
+    m *= 42;
+    assert(n == 84);
+
     return true;
 }
 
@@ -67,6 +76,8 @@ static constexpr bool _tensors()
     assert((K[1,0] = X[1] * Y[0]));
     assert((K[0,1] = X[0] * Y[1]));
     assert((K[1,1] = X[1] * Y[1]));
+
+    // X += Y(i);
 
     return true;
 }

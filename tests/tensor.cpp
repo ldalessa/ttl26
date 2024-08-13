@@ -1,6 +1,6 @@
 #undef DNDEBUG
 
-#include <ttl/tensor.hpp>
+#include <ttl/ttl.hpp>
 
 static_assert(ttl::scalar<int>);
 static_assert(ttl::scalar<int const>);

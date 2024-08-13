@@ -15,4 +15,22 @@ namespace ttl::tree
         static_assert(rank<A> == rank<B>);
         return assign(__fwd(a), __fwd(b));
     }
+
+    template <tensor A, tensor B>
+    inline constexpr auto operator+=(A&& a, B&& b) -> decltype(a) {
+        a = __fwd(a) + __fwd(b);
+        return a;
+    }
+
+    template <tensor A, tensor B>
+    inline constexpr auto operator-=(A&& a, B&& b) -> decltype(a) {
+        a = __fwd(a) - __fwd(b);
+        return a;
+    }
+
+    template <scalar A, scalar B>
+    inline constexpr auto operator*=(A&& a, B&& b)  -> decltype(a) {
+        a = __fwd(a) * __fwd(b);
+        return a;
+    }
 }

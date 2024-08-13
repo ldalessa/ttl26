@@ -11,5 +11,8 @@
         "--header-insertion=never"
     ],
     "C_Cpp.formatting": "clangFormat",
-    "clang-format.fallbackStyle": "WebKit"
+    "clang-format.fallbackStyle": "WebKit",
+    "editor.unicodeHighlight.allowedCharacters": {
+        "ʹ": true
+    }
 }

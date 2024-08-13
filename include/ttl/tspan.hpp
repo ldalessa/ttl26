@@ -16,15 +16,19 @@
 
 namespace ttl
 {
+    template <class T, std::size_t... i>
+    void std_extents_v(std::extents<T, i...>&);
+    
     /// A little concept to constrain/SFINAE on std::extents.
     template <class T>
     concept std_extents = requires(T& t) {
-        []<class U, std::size_t... i>(std::extents<U, i...>) {}(t);
+        // std_extents_v(t);
+        []<class U, std::size_t... i>(std::extents<U, i...>&) {}(t);
     };
 
     template <
         class T,
-        class Extents,
+        std_extents Extents,
         class LayoutPolicy = std::layout_right,
         class AccessorPolicy = std::default_accessor<T>>
     struct tspan : public std::mdspan<T, Extents, LayoutPolicy, AccessorPolicy> {

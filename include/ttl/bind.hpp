@@ -44,9 +44,43 @@ namespace ttl
     }
 }
 
-template <class T, ttl::index_string... str>
-constexpr auto ttl::tree::node::operator()(this T&& self, index<str>... is)
-    -> bind<T, (str + ...)>
+namespace ttl::tree 
 {
-    return ttl::bind(__fwd(self), is...);
+    template <class T, ttl::index_string... str>
+    constexpr auto ttl::tree::node::operator()(this T&& self, index<str>... is)
+        -> bind<T, (str + ...)>
+    {
+        return ttl::bind(__fwd(self), is...);
+    }
+
+    // template <index_string ind, class A>
+    // inline constexpr auto autobind(A&& a) -> decltype(ttl::bind(__fwd(a), index<ind>()));
+
+    // template <tensor A, tensor B>
+    // inline constexpr auto operator+(A&&, B&&);
+
+    // template <tensor A, expression B>
+    // inline constexpr auto operator+(A&& a, B&& b) -> decltype(autobind<outer<B>>(__fwd(a)) + __fwd(b));
+    //-> decltype(ttl::bind(__fwd(a), index<outer<B>>{}) + __fwd(b));
+    //  {
+    //     return ttl::bind(__fwd(a), index<outer<B>>{}) + __fwd(b);
+    // }
+
+    // template <expression A, tensor B>
+    // inline constexpr auto operator+(A&& a, B&& b) -> decltype(__fwd(a) + ttl::bind(__fwd(b), index<outer<A>>())) {
+    //     return __fwd(a) + ttl::bind(__fwd(b), index<outer<A>>());
+    // }
+
+    // template <tensor A, tensor B>
+    // inline constexpr auto operator-(A&&, B&&);
+
+    // template <tensor A, expression B>
+    // inline constexpr auto operator-(A&& a, B&& b) -> decltype(ttl::bind(__fwd(a), outer<B>) + __fwd(b)) {
+    //     return ttl::bind(__fwd(a), outer<B>) + __fwd(b);
+    // }
+
+    // template <expression A, tensor B>
+    // inline constexpr auto operator-(A&& a, B&& b) -> decltype(__fwd(a) + ttl::bind(__fwd(b), outer<A>)) {
+    //     return __fwd(a) + ttl::bind(__fwd(b), outer<A>);
+    // }
 }

@@ -27,4 +27,7 @@ namespace ttl
     template <class T>
         requires requires { _::outer<T>::value; }
     inline constexpr auto outer = _::outer<T>::value;
+
+    // template <class T>
+    // inline constexpr index<outer<T>> outer_index{};
 }
