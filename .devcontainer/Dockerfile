@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1-labs
 FROM debian:testing
 
+ARG USER_NAME
+
 RUN apt-get update
 RUN apt-get -y full-upgrade
 RUN apt-get -y install wget sudo make valgrind git
@@ -21,11 +23,14 @@ RUN arch="$(uname -m)"; \
     rm cmake-$version-linux-$arch.sh
 
 
-RUN useradd -rms /bin/bash -G sudo -p "$(openssl passwd -6 devcontainer)" devcontainer
-RUN passwd -d devcontainer
+RUN useradd -rms /bin/bash -G sudo -p "$(openssl passwd -6 devcontainer)" $USER_NAME
+RUN passwd -d ldalessa
 
-USER devcontainer
+USER $USER_NAME
 
 ENV PATH="/usr/lib/llvm-18/bin:$PATH" \
     CC=clang \
-    CXX=clang++
+    CXX=clang++ \
+    TERM=xterm-256color \
+    EDITOR=emacs \
+    GIT_EDITOR=emacs

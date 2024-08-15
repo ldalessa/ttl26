@@ -2,5 +2,12 @@
 	"name": "ttl26",
 	"build": {
 		"dockerfile": "Dockerfile"
-	}
+        "args": {
+            "USER_NAME": "${localEnv:USER}"
+        }
+	},
+    "mounts": [
+        "type=bind,source=${localWorkspaceFolder},target=/work",
+        "type=bind,source=${localEnv:HOME}/.ssh,target=/home/devcontainer/.ssh,readonly"
+    ]
 }
