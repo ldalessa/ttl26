@@ -12,4 +12,4 @@ fi
 sudo apt -y update
 sudo apt -y full-upgrade
 sudo apt -y autoremove
-sudo apt -y install build-essential gcc g++ gdb man-db emacs elpa-cmake-mode
+sudo apt -y install build-essential gcc g++ gdb man-db emacs elpa-cmake-mode ispell
