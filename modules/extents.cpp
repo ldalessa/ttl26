@@ -74,23 +74,18 @@ inline constexpr class
     }
 
     template <has_extents_trait T>
-    static constexpr auto operator()(T&& t) -> decltype(ttl::tensor_traits<std::remove_cvref_t<T>>::extents(FWD(t))) {
-        return ttl::tensor_traits<std::remove_cvref_t<T>>::extents(FWD(t));
-    }
+    static constexpr auto operator()(T&& t)
+        -> ARROW( ttl::tensor_traits<std::remove_cvref_t<T>>::extents(FWD(t)) );
 
     template <std::ranges::range Range>
     requires (not has_extents_trait<Range>)
-    constexpr auto operator()(this auto self, Range&& a) -> decltype(_prepend(FWD(a), self(*std::ranges::begin(a)))) {
-        assert(std::ranges::size(a) != 0);
-        auto&& next = self(*std::ranges::begin(a));
-        return _prepend(FWD(a), FWD(next));
-    }
+    constexpr auto operator()(this auto self, Range&& a)
+        -> ARROW( _prepend(FWD(a), self(*std::ranges::begin(a))) );
 
     template <class T>
     requires (not has_extents_trait<T> and not std::ranges::range<T>)
-    static constexpr auto operator()(T&& t) -> decltype(FWD(t).extents()) {
-        return FWD(t).extents();
-    }
+    static constexpr auto operator()(T&& t)
+        -> ARROW( FWD(t).extents() );
 } extents;
 
 template <class T>

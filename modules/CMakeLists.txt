@@ -6,13 +6,17 @@ target_sources(ttl
         concepts.cpp
         cstring.cpp
         extents.cpp
+        evaluate.cpp
         index.cpp
         istring.cpp
         rank.cpp
         tensor_traits.cpp
         tspan.cpp)
 
-target_compile_options(ttl PUBLIC -include ${CMAKE_CURRENT_SOURCE_DIR}/FWD.hpp)
+target_compile_options(ttl PUBLIC
+  --include=${CMAKE_CURRENT_SOURCE_DIR}/FWD.hpp
+  --include=${CMAKE_CURRENT_SOURCE_DIR}/ARROW.hpp)
+
 target_compile_features(ttl PUBLIC cxx_std_26)
 
 # add_executable(demo main.cpp)
