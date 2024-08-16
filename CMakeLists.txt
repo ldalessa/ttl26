@@ -13,3 +13,5 @@ if (TTL_ENABLE_TESTS)
   include(CTest)
   add_subdirectory(tests)
 endif (TTL_ENABLE_TESTS)
+
+add_subdirectory(modules)

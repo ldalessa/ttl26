@@ -2,6 +2,14 @@
     "version": 3,
     "configurePresets": [
         {
+            "name": "ninja",
+            "hidden": true,
+            "cacheVariables": {
+                "type": "STRING",
+                "CMAKE_GENERATOR": "Ninja"
+            }
+        },
+        {
             "name": "clang-18-toolchain",
             "hidden": true,
             "cacheVariables": {
@@ -33,7 +41,7 @@
         },
         {
             "name": "lto",
-            "inherits": "clang-toolchain",
+            "inherits": ["clang-toolchain", "ninja"],
             "binaryDir": "${sourceDir}/build/timing",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -48,7 +56,7 @@
         },
 	    {
             "name": "release",
-            "inherits": "clang-toolchain",
+            "inherits": ["clang-toolchain", "ninja"],
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -63,7 +71,7 @@
         },
         {
             "name": "og",
-            "inherits": "clang-toolchain",
+            "inherits": ["clang-toolchain", "ninja"],
             "binaryDir": "${sourceDir}/build/og",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -78,7 +86,7 @@
         },
         {
             "name": "debug",
-            "inherits": "clang-toolchain",
+            "inherits": ["clang-toolchain", "ninja"],
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -93,7 +101,7 @@
         },
         {
             "name": "asan",
-            "inherits": "debug",
+            "inherits": ["debug", "ninja"],
             "binaryDir": "${sourceDir}/build/asan",
             "cacheVariables": {
                 "CMAKE_CXX_FLAGS_DEBUG": {
@@ -104,7 +112,7 @@
         },
         {
             "name": "asan-og",
-            "inherits": "og",
+            "inherits": ["og", "ninja"],
             "binaryDir": "${sourceDir}/build/asan-og",
             "cacheVariables": {
                 "CMAKE_CXX_FLAGS_OG": {
@@ -115,7 +123,7 @@
         },
         {
             "name": "tidy",
-            "inherits": ["debug","clangd"],
+            "inherits": ["debug","clangd","ninja"],
             "binaryDir": "${sourceDir}/build/tidy",
             "cacheVariables": {
                 "CMAKE_CXX_CLANG_TIDY": {

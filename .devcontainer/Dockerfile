@@ -5,7 +5,7 @@ ARG USER_NAME
 
 RUN apt-get update
 RUN apt-get -y full-upgrade
-RUN apt-get -y install wget sudo make valgrind git
+RUN apt-get -y install wget sudo make ninja-build valgrind git
 RUN apt-get -y install lsb-release software-properties-common gnupg # llvm.sh
 
 # install llvm
