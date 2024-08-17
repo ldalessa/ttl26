@@ -9,9 +9,14 @@ module;
 #include <vector>
 
 module ttl:rank;
+import :extents;
 
+/// The default for the rank implementation is to defer to the extents
+/// implementation, which is what is customized by user code. This will always
+/// work for valid tensors, but we can provide some short circuits for other
+/// well-known types.
 template <class T>
-inline constexpr std::size_t rank_impl = not defined(rank_impl<T>);
+inline constexpr std::size_t rank_impl = decltype(auto(extents(std::declval<T>())))::rank();
 
 template <std::integral T>
 inline constexpr std::size_t rank_impl<T> = 0zu;

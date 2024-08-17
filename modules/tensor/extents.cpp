@@ -200,11 +200,9 @@ static_assert(has_extents<std::vector<int> const&&>);
 static_assert(has_extents<std::vector<std::array<int, 3>>>);
 static_assert(has_extents<std::vector<std::array<int[3], 3>>>);
 
-[[deprecated]]
-void print(auto&&) {}
-
-template <auto>
-struct print_v;
+static_assert(has_extents<std::mdspan<int, std::extents<std::size_t>>>);
+static_assert(has_extents<std::mdspan<int, std::extents<std::size_t, 1>>>);
+static_assert(has_extents<std::mdspan<int, std::extents<std::size_t, 2, 3>>>);
 
 #undef DNDEBUG
 

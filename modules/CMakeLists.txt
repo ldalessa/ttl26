@@ -4,12 +4,14 @@ target_sources(ttl
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
         ttl.cpp
         concepts.cpp
-        cstring.cpp
         extents.cpp
         evaluate.cpp
-        index.cpp
-        istring.cpp
+        index/cstring.cpp
+        index/index.cpp
+        index/istring.cpp
+        outer.cpp
         rank.cpp
+        tensor.cpp
         tensor_traits.cpp
         tspan.cpp)
 

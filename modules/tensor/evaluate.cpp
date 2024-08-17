@@ -9,7 +9,6 @@ module;
 #include <utility>
 
 module ttl:evaluate;
-import :concepts;
 import :tensor_traits;
 
 template <class T, class... I>
@@ -19,10 +18,14 @@ concept has_evaluate_trait = requires (T&& t, I... i) {
 
 inline constexpr struct
 {
-    static constexpr auto operator()(integral auto && t)
+    template <class T>
+    requires std::integral<std::decay_t<T>>
+    static constexpr auto operator()(T&& t)
         -> ARROW( FWD(t) );
 
-    static constexpr auto operator()(floating_point auto&& t)
+    template <class T>
+    requires std::floating_point<std::decay_t<T>>
+    static constexpr auto operator()(T&& t)
         -> ARROW( FWD(t) );
 
     template <class T, std::integral... Is>
@@ -51,43 +54,39 @@ inline constexpr struct
 } evaluate;
 
 template <class T, std::size_t N>
-concept evaluate_rank_n = requires (T&& t, std::array<std::size_t, N> const& index) {
+concept has_evaluate_n = requires (T&& t, std::array<std::size_t, N> const& index) {
     evaluate(FWD(t), index);
 };
 
-static_assert(evaluate_rank_n<float, 0>);
+static_assert(has_evaluate_n<float, 0>);
 
-static_assert(evaluate_rank_n<int, 0>);
-static_assert(evaluate_rank_n<int[1], 1>);
-static_assert(evaluate_rank_n<int[1][1], 2>);
+static_assert(has_evaluate_n<int, 0>);
+static_assert(has_evaluate_n<int[1], 1>);
+static_assert(has_evaluate_n<int[1][1], 2>);
 
-static_assert(evaluate_rank_n<int&, 0>);
-static_assert(evaluate_rank_n<int(&)[1], 1>);
-static_assert(evaluate_rank_n<int(&)[1][1], 2>);
+static_assert(has_evaluate_n<int&, 0>);
+static_assert(has_evaluate_n<int(&)[1], 1>);
+static_assert(has_evaluate_n<int(&)[1][1], 2>);
 
-static_assert(evaluate_rank_n<int&&, 0>);
-static_assert(evaluate_rank_n<int(&&)[1], 1>);
-static_assert(evaluate_rank_n<int(&&)[1][1], 2>);
+static_assert(has_evaluate_n<int&&, 0>);
+static_assert(has_evaluate_n<int(&&)[1], 1>);
+static_assert(has_evaluate_n<int(&&)[1][1], 2>);
 
-static_assert(evaluate_rank_n<int const, 0>);
-static_assert(evaluate_rank_n<int const[1], 1>);
-static_assert(evaluate_rank_n<int const[1][1], 2>);
+static_assert(has_evaluate_n<int const, 0>);
+static_assert(has_evaluate_n<int const[1], 1>);
+static_assert(has_evaluate_n<int const[1][1], 2>);
 
-static_assert(evaluate_rank_n<int const&, 0>);
-static_assert(evaluate_rank_n<int const(&)[1], 1>);
-static_assert(evaluate_rank_n<int const(&)[1][1], 2>);
+static_assert(has_evaluate_n<int const&, 0>);
+static_assert(has_evaluate_n<int const(&)[1], 1>);
+static_assert(has_evaluate_n<int const(&)[1][1], 2>);
 
-static_assert(evaluate_rank_n<int const&&, 0>);
-static_assert(evaluate_rank_n<int const(&&)[1], 1>);
-static_assert(evaluate_rank_n<int const(&&)[1][1], 2>);
+static_assert(has_evaluate_n<int const&&, 0>);
+static_assert(has_evaluate_n<int const(&&)[1], 1>);
+static_assert(has_evaluate_n<int const(&&)[1][1], 2>);
 
-static_assert(evaluate_rank_n<std::span<int, 1>, 1>);
-static_assert(evaluate_rank_n<std::span<int[1], 1>, 2>);
-static_assert(evaluate_rank_n<std::span<int[1][1], 1>, 3>);
-
-
-// static_assert(evaluate_with_n<std::span<int, 1>&, 1>);
-// static_assert(evaluate_with_n<std::array<int[1], 1>, 2>);
+static_assert(has_evaluate_n<std::span<int, 1>, 1>);
+static_assert(has_evaluate_n<std::span<int[1], 1>, 2>);
+static_assert(has_evaluate_n<std::span<int[1][1], 1>, 3>);
 
 static constexpr bool check_evaluate()
 {

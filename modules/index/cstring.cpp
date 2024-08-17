@@ -8,7 +8,7 @@ module;
 module ttl:cstring;
 
 template <class T>
-concept character = std::same_as<T, char16_t> 
+concept character = std::same_as<T, char16_t>
     or std::same_as<T, char8_t>
     or std::same_as<T, char>;
 
@@ -25,7 +25,7 @@ struct cstring
     }
 
     template <std::size_t M>
-    constexpr bool operator==(cstring<M> const& b) const 
+    constexpr bool operator==(cstring<M> const& b) const
     {
         return std::ranges::equal(*this, b);
     }
@@ -98,7 +98,7 @@ struct cstring
                 return _data[i];
             }
         } out {
-            i - _data, 
+            i - _data,
             j - _data
         };
 
@@ -121,13 +121,13 @@ private:
 #undef DNDEBUG
 
 template <class T, class U>
-inline constexpr auto cstring_indexable_with = requires (T t, U u) {
+static constexpr auto cstring_indexable_with = requires (T t, U u) {
     t.count(u);
     t.index_of_1(u);
     t.index_of_2(u);
 };
 
-static constexpr bool test_cstring() 
+static constexpr bool test_cstring()
 {
     constexpr cstring i = "i";
     static_assert(cstring_indexable_with<decltype(i), char>);
@@ -176,7 +176,7 @@ static constexpr bool test_cstring()
     assert(μ.size() == 1);
     assert(μ[0] == u'μ');
     assert(μ.index_of_1(u'μ') == 0);
-    
+
     return true;
 }
 

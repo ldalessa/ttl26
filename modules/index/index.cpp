@@ -1,6 +1,7 @@
 module;
 
 #include <cstddef>
+#include <type_traits>
 
 export module ttl:index;
 import :istring;
@@ -13,7 +14,7 @@ import :istring;
 ///
 /// In the future this could be set by the build system.
 ///
-/// It is given the name `i` and not part of the ttl namespace in 
+/// It is given the name `i` and not part of the ttl namespace in
 /// order to minimize the amount of characters that are printed
 /// during compilation errors. The template class is not exported
 /// so it shouldn't collide with anything. The deduction guide *is*
@@ -21,6 +22,7 @@ import :istring;
 template <std::size_t N>
 struct i : istring<N>
 {
+    using _ttl_istring_tag_type = void;
     using i::istring::istring;
 };
 
@@ -32,11 +34,13 @@ export namespace ttl
     /// The ttl::index serves as a CNTTP wrapper so that we
     /// can process tensor expressions using constexpr index
     /// declarations. They also serve to keep track of any
-    /// index values for projected indices (not unlike how 
+    /// index values for projected indices (not unlike how
     /// std::extent will track extents for dynamic extents).
     template <i str>
     struct index
     {
+        using _ttl_index_tag_type = void;
+
         static constexpr auto _size = str.size();
         int _projected[_size]{};
 
@@ -48,13 +52,13 @@ export namespace ttl
             static_assert(_size == 1 and str[0] == str.projected);
         }
     };
-    
+
     index(int) -> index<projection>;
 
     /// Clients can concatentate their indices with operator+.
     template <i a, i b>
-    inline constexpr auto operator+(index<a> const&, index<b> const&) 
-        -> index<a + b> 
+    inline constexpr auto operator+(index<a> const&, index<b> const&)
+        -> index<a + b>
     {
         return {};
     }
@@ -67,6 +71,16 @@ export namespace ttl
         }
     }
 }
+
+template <class T>
+concept ttl_istring = requires {
+    typename std::remove_cvref_t<T>::_ttl_istring_tag_type;
+};
+
+template <class T>
+concept ttl_index = requires {
+    typename std::remove_cvref_t<T>::_ttl_index_tag_type;
+};
 
 #undef NDEBUG
 
