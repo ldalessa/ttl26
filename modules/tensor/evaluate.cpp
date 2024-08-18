@@ -9,54 +9,74 @@ module;
 #include <utility>
 
 module ttl:evaluate;
+import :concepts;
 import :tensor_traits;
 
-template <class T, class... I>
-concept has_evaluate_trait = requires (T&& t, I... i) {
-    ttl::tensor_traits<std::remove_cvref_t<T>>::evaluate(FWD(t), i...);
-};
+namespace stdr = std::ranges;
 
-inline constexpr struct
+namespace ttl
 {
-    template <class T>
-    requires std::integral<std::decay_t<T>>
-    static constexpr auto operator()(T&& t)
-        -> ARROW( FWD(t) );
+    /// Implement the evaluate() overload set as a function object.
+    inline constexpr struct
+    {
+        /// Evaluate a stdlib scalar type.
+        template <class T>
+            requires (concepts::integral<T> or concepts::floating_point<T>)
+        static constexpr auto operator()(T&& t)
+            -> ARROW( FWD(t) );
 
-    template <class T>
-    requires std::floating_point<std::decay_t<T>>
-    static constexpr auto operator()(T&& t)
-        -> ARROW( FWD(t) );
+        /// Evaluate any type that has the tensr_trait::evaluate defined.
+        template <class T, std::integral... Is>
+            requires concepts::has_evaluate_trait<T, Is...>
+        static constexpr auto operator()(T&& t, Is... i)
+            -> ARROW( ttl::tensor_traits<std::decay_t<T>>::evaluate(FWD(t), i...) );
 
-    template <class T, std::integral... Is>
-    requires has_evaluate_trait<T, Is...>
-    static constexpr auto operator()(T&& t, Is... i)
-        -> ARROW( ttl::tensor_traits<std::remove_cvref_t<T>>::evaluate(FWD(t), i...) );
+        /// Evaluate any forward range.
+        ///
+        /// This simply pops a single index out of the index pack and uses it to
+        /// index into the outermost range, forwarding the result to a recursive
+        /// instantiation of evaluate().
+        template <class T, std::integral... Is>
+            requires (not concepts::has_evaluate_trait<T, std::size_t, Is...> and stdr::forward_range<T>)
+        constexpr auto operator()(this auto self, T&& t, std::size_t i, Is... j)
+            -> ARROW( self(*stdr::next(stdr::begin(t), i), j...) );
 
-    template <class T, std::integral... Is>
-    requires (not has_evaluate_trait<T, std::size_t, Is...> and std::ranges::forward_range<T>)
-    constexpr auto operator()(this auto self, T&& t, std::size_t i, Is... j)
-        -> ARROW( self(*std::ranges::next(std::ranges::begin(t), i), j...) );
+        /// Evaluate types with appropriate multidimensional index opeartors.
+        ///
+        /// This will match mdspan, but it will also match all of the expression
+        /// tree types in the tree modules.
+        template <class T, std::integral... Is>
+            requires (not concepts::has_evaluate_trait<T, Is...> and not stdr::forward_range<T>)
+        static constexpr auto operator()(T&& t, Is... i)
+            -> ARROW( FWD(t)[i...] );
 
-    template <class T, std::integral... Is>
-    requires (not has_evaluate_trait<T, Is...> and not std::ranges::forward_range<T>)
-    static constexpr auto operator()(T&& t, Is... i)
-        -> ARROW( FWD(t)[i...] );
+        /// The _check_n functions are here to help the has_evaluate_n concept.
+        ///
+        /// @{
+        template <std::size_t N, std::size_t... i>
+        constexpr auto _check_n(this auto self, auto&& t, std::array<std::size_t, N> const& index, std::index_sequence<i...>)
+            -> ARROW( self(FWD(t), index[i]...) );
 
-    template <std::size_t N, std::size_t... i>
-    constexpr auto operator()(this auto self, auto&& t, std::array<std::size_t, N> const& index, std::index_sequence<i...>)
-        -> ARROW( self(FWD(t), index[i]...) );
+        template <std::size_t N>
+        constexpr auto _check_n(auto&& t, std::array<std::size_t, N> const& index) const
+            -> ARROW( _check_n(FWD(t), index, std::make_index_sequence<N>()) );
+        /// @}
 
-    template <std::size_t N>
-    constexpr auto operator()(this auto self, auto&& t, std::array<std::size_t, N> const& index)
-        -> ARROW( self(FWD(t), index, std::make_index_sequence<N>()) );
+    } evaluate;
 
-} evaluate;
+    namespace concepts
+    {
+        template <class T, std::size_t N>
+        concept has_evaluate_n = requires (T&& t, std::array<std::size_t, N> const& index) {
+            evaluate._check_n(FWD(t), index);
+        };
+    }
+}
 
-template <class T, std::size_t N>
-concept has_evaluate_n = requires (T&& t, std::array<std::size_t, N> const& index) {
-    evaluate(FWD(t), index);
-};
+using namespace ttl;
+using namespace ttl::concepts;
+
+#undef DNDEBUG
 
 static_assert(has_evaluate_n<float, 0>);
 

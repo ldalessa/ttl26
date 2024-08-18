@@ -2,6 +2,7 @@ module;
 
 #include <array>
 #include <cstddef>
+#include <functional>
 #include <ranges>
 #include <mdspan>
 #include <span>
@@ -10,28 +11,38 @@ module;
 
 module ttl:rank;
 import :extents;
+import :tensor_traits;
 
-/// The default for the rank implementation is to defer to the extents
-/// implementation, which is what is customized by user code. This will always
-/// work for valid tensors, but we can provide some short circuits for other
-/// well-known types.
-template <class T>
-inline constexpr std::size_t rank_impl = decltype(auto(extents(std::declval<T>())))::rank();
+namespace stdr = std::ranges;
 
-template <std::integral T>
-inline constexpr std::size_t rank_impl<T> = 0zu;
+namespace ttl
+{
+    template <class T>
+    inline constexpr std::size_t rank = []
+    {
+        using U = std::remove_cvref_t<T>;
+        if constexpr (std::integral<U> or std::floating_point<U>) {
+            return 0zu;
+        }
+        else if constexpr (concepts::has_rank_trait<T>) {
+            return tensor_traits<U>::rank();
+        }
+        else if constexpr (stdr::range<U>) {
+            return rank<stdr::range_value_t<U>> + 1zu;
+        }
+        else if constexpr (concepts::mdspan<U>) {
+            return rank<typename U::element_type> + U::extents_type::rank();
+        }
+        else {
+            using extents_type = std::invoke_result_t<_extents_fn, U>;
+            return std::decay_t<extents_type>::rank();
+        }
+    }();
+}
 
-template <std::floating_point T>
-inline constexpr std::size_t rank_impl<T> = 0zu;
+using namespace ttl;
 
-template <std::ranges::range T>
-inline constexpr std::size_t rank_impl<T> = rank_impl<std::ranges::range_value_t<T>> + 1zu;
-
-template <class T, class Extents, class Layout, class Accessor>
-inline constexpr std::size_t rank_impl<std::mdspan<T, Extents, Layout, Accessor>> = Extents::rank() + rank_impl<T>;
-
-template <class T>
-inline constexpr std::size_t rank = rank_impl<std::remove_cvref_t<T>>;
+#undef DNDEBUG
 
 static_assert(rank<int> == 0);
 static_assert(rank<int[1]> == 1);

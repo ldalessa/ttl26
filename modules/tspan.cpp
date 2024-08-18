@@ -11,6 +11,8 @@ module;
 
 export module ttl:tspan;
 
+namespace stdr = std::ranges;
+
 export namespace ttl
 {
     template <
@@ -31,19 +33,19 @@ export namespace ttl
         /// Construct a tspan for a congtiguous range.
         /// @{
         template <class R>
-            requires std::ranges::contiguous_range<R> and std::ranges::sized_range<R>
+            requires stdr::contiguous_range<R> and stdr::sized_range<R>
         constexpr tspan(R&& r)
-            : tspan::mdspan(std::ranges::data(r), std::ranges::size(r))
+            : tspan::mdspan(stdr::data(r), stdr::size(r))
         {
         }
 
-        constexpr tspan(std::ranges::contiguous_range auto&& r, Extents extents)
-            : tspan::mdspan(std::ranges::data(r), std::move(extents))
+        constexpr tspan(stdr::contiguous_range auto&& r, Extents extents)
+            : tspan::mdspan(stdr::data(r), std::move(extents))
         {
         }
 
-        constexpr tspan(std::ranges::contiguous_range auto&& r, std::size_t i, std::integral auto... j)
-            : tspan::mdspan(std::ranges::data(r), Extents(i, j...))
+        constexpr tspan(stdr::contiguous_range auto&& r, std::size_t i, std::integral auto... j)
+            : tspan::mdspan(stdr::data(r), Extents(i, j...))
         {
         }
         /// @}
@@ -108,24 +110,24 @@ export namespace ttl
 
     /// Infer the scalar type and dynamic extents for a contiguous range.
     template <class R>
-        requires std::ranges::contiguous_range<R> and std::ranges::sized_range<R>
+        requires stdr::contiguous_range<R> and stdr::sized_range<R>
     tspan(R&&)
         -> tspan<
-            std::remove_reference_t<std::ranges::range_reference_t<R>>,
+            std::remove_reference_t<stdr::range_reference_t<R>>,
             std::extents<std::size_t, std::dynamic_extent>>;
 
     /// Infer T as the range value type.
-    template <std::ranges::contiguous_range R, class T, std::size_t... Es>
+    template <stdr::contiguous_range R, class T, std::size_t... Es>
     tspan(R&&, std::extents<T, Es...>)
         -> tspan<
-            std::remove_reference_t<std::ranges::range_reference_t<R>>,
+            std::remove_reference_t<stdr::range_reference_t<R>>,
             std::extents<T, Es...>>;
 
     /// Infer T as the range value type, and the dynamic extents.
-    template <std::ranges::contiguous_range R>
+    template <stdr::contiguous_range R>
     tspan(R&&, std::integral auto, std::integral auto... i)
         -> tspan<
-            std::remove_reference_t<std::ranges::range_reference_t<R>>,
+            std::remove_reference_t<stdr::range_reference_t<R>>,
             std::extents<std::size_t, std::dynamic_extent, ((void)i, std::dynamic_extent)...>>;
 
     /// Infer T as the iterator value type.

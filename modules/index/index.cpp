@@ -6,37 +6,14 @@ module;
 export module ttl:index;
 import :istring;
 
-/// Strong typedef for indexes.
-///
-/// Right now this is strongly typdeffed to support u16 characters
-/// which is good enough for the set of normal ascii and greek
-/// characters that are commonly used in tensor indexing.
-///
-/// In the future this could be set by the build system.
-///
-/// It is given the name `i` and not part of the ttl namespace in
-/// order to minimize the amount of characters that are printed
-/// during compilation errors. The template class is not exported
-/// so it shouldn't collide with anything. The deduction guide *is*
-/// exported so that `ttl::index<"i"> i;` can properly deduce.
-template <std::size_t N>
-struct i : istring<N>
-{
-    using _ttl_istring_tag_type = void;
-    using i::istring::istring;
-};
-
-export template <character T, std::size_t N>
-i(T const(&)[N]) -> i<N>;
-
-export namespace ttl
+namespace ttl
 {
     /// The ttl::index serves as a CNTTP wrapper so that we
     /// can process tensor expressions using constexpr index
     /// declarations. They also serve to keep track of any
     /// index values for projected indices (not unlike how
     /// std::extent will track extents for dynamic extents).
-    template <i str>
+    export template <istring str>
     struct index
     {
         using _ttl_index_tag_type = void;
@@ -56,38 +33,36 @@ export namespace ttl
     index(int) -> index<projection>;
 
     /// Clients can concatentate their indices with operator+.
-    template <i a, i b>
+    template <istring a, istring b>
     inline constexpr auto operator+(index<a> const&, index<b> const&)
         -> index<a + b>
     {
         return {};
     }
 
-    namespace literals
+    export namespace literals
     {
-        template <i str>
+        template <istring str>
         inline consteval auto operator""_i() -> index<str> {
             return {};
         }
     }
+
+    namespace concepts
+    {
+        template <class T>
+        concept index = requires {
+            typename std::decay_t<T>::_ttl_index_tag_type;
+        };
+    }
 }
-
-template <class T>
-concept ttl_istring = requires {
-    typename std::remove_cvref_t<T>::_ttl_istring_tag_type;
-};
-
-template <class T>
-concept ttl_index = requires {
-    typename std::remove_cvref_t<T>::_ttl_index_tag_type;
-};
 
 #undef NDEBUG
 
 static consteval bool test_index() {
     using namespace ttl::literals;
-    i n = "n";
-    i m = "m";
+    ttl::istring n = "n";
+    ttl::istring m = "m";
     (void)(n + m);
 
     ttl::index<"i"> i;

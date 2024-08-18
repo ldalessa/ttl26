@@ -4,16 +4,18 @@ target_sources(ttl
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
         ttl.cpp
         concepts.cpp
-        extents.cpp
-        evaluate.cpp
+        tensor_traits.cpp
+        tspan.cpp
         index/cstring.cpp
         index/index.cpp
         index/istring.cpp
-        outer.cpp
-        rank.cpp
-        tensor.cpp
-        tensor_traits.cpp
-        tspan.cpp)
+        tensor/extents.cpp
+        tensor/evaluate.cpp
+        tensor/outer.cpp
+        tensor/rank.cpp
+        tensor/tensor.cpp
+        tree/bind.cpp
+        tree/expression.cpp)
 
 target_compile_options(ttl PUBLIC
   --include=${CMAKE_CURRENT_SOURCE_DIR}/FWD.hpp

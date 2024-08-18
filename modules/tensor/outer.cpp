@@ -4,40 +4,44 @@ module;
 
 module ttl:outer;
 import :index;
+import :istring;
 import :rank;
 
-namespace
+namespace ttl
 {
     template <class T>
-    concept has_outer_member = requires (T&& t) {
-        { std::remove_cvref_t<T>::outer() } -> ttl_istring;
+    concept _has_outer_member = requires (T&& t) {
+        std::remove_cvref_t<T>::outer();
     };
 
     template <class T>
-    struct outer_impl;
+    struct _outer_impl;
 
     template <class T>
-    requires (rank<T> == 0)
-    struct outer_impl<T> {
-        static constexpr ttl_istring auto value = i<1>{};
+        requires (rank<T> == 0)
+    struct _outer_impl<T> {
+        static constexpr auto value = ttl::istring<1>{};
     };
 
-    template <has_outer_member T>
-    requires (rank<T> != 0)
-    struct outer_impl<T> {
-        static constexpr ttl_istring auto value = T::outer();
+    template <_has_outer_member T>
+        requires (rank<T> != 0)
+    struct _outer_impl<T> {
+        static constexpr auto value = T::outer();
     };
 
     template <class T>
-    concept has_outer_impl = requires {
-        { outer_impl<std::remove_cvref_t<T>>::value } -> ttl_istring;
+    concept _has_outer_impl = requires {
+        _outer_impl<std::remove_cvref_t<T>>::value;
     };
+
+    template <_has_outer_impl T>
+    inline constexpr auto outer = _outer_impl<std::remove_cvref_t<T>>::value;
+
+    namespace concepts
+    {
+        template <class T>
+        concept has_outer = requires {
+            outer<T>;
+        };
+    }
 }
-
-template <has_outer_impl T>
-inline constexpr ttl_istring auto outer = outer_impl<std::remove_cvref_t<T>>::value;
-
-template <class T>
-concept has_outer = requires {
-    { outer<T> } -> ttl_istring;
-};
