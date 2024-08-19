@@ -7,6 +7,7 @@ target_sources(ttl
         tensor_traits.cpp
         tspan.cpp
         index/cstring.cpp
+        index/imap.cpp
         index/index.cpp
         index/istring.cpp
         tensor/extents.cpp

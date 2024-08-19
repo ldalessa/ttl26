@@ -64,22 +64,30 @@ namespace ttl::concepts
         check_std_mdspan(t);
     };
 
-    template <class T, std::size_t... Extents>
-    void check_std_extents(std::extents<T, Extents...>&);
+    template <class>
+    inline constexpr bool _check_std_extents = false;
 
     template <class T, std::size_t... Extents>
-    void check_std_extents(std::extents<T, Extents...> const&);
+    inline constexpr bool _check_std_extents<std::extents<T, Extents...>> = true;
 
     template <class T>
-    concept extents = requires (T t) {
-        check_std_extents(t);
-    };
+    concept extents = _check_std_extents<std::decay_t<T>>;
+
+    template <class>
+    inline constexpr bool _check_integral_constant = false;
 
     template <class T, T N>
-    void check_integral_constant(std::integral_constant<T, N>);
+    inline constexpr bool _check_integral_constant<std::integral_constant<T, N>> = true;
 
     template <class T>
-    concept integral_constant = requires (T t) {
-        check_integral_constant(t);
-    };
+    concept integral_constant = _check_integral_constant<std::decay_t<T>>;
+
+    template <class>
+    inline constexpr bool _check_index_sequence = false;
+
+    template <std::size_t... Is>
+    inline constexpr bool _check_index_sequence<std::index_sequence<Is...>> = true;
+
+    template <class T>
+    concept index_sequence = _check_index_sequence<std::decay_t<T>>;
 }

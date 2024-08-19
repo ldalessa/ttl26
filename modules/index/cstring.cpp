@@ -87,12 +87,25 @@ namespace ttl
             return FWD(self)._data[i];
         }
 
-        constexpr auto count(concepts::character auto const c) const -> std::size_t {
+        constexpr auto count(concepts::character auto const c) const ->
+            std::size_t
+        {
             return stdr::count(*this, c);
         }
 
-        constexpr auto index_of_1(concepts::character auto const c) const -> std::size_t {
+        constexpr auto index_of_1(concepts::character auto const c) const ->
+            std::size_t
+        {
             return stdr::find(*this, c) - _data;
+        }
+
+        constexpr auto index_of_1_nth(concepts::character auto const c, std::size_t const n) const ->
+            std::size_t
+        {
+            std::size_t i = 0;
+            return stdr::find_if(*this, [&](char_t const d) {
+                return (c == d) and (i++ == n);
+            }) - _data;
         }
 
         struct _index_of_2_result
@@ -103,7 +116,8 @@ namespace ttl
             }
         };
 
-        constexpr auto index_of_2(concepts::character auto const c) const -> _index_of_2_result
+        constexpr auto index_of_2(concepts::character auto const c) const ->
+            _index_of_2_result
         {
             auto const i = stdr::find(*this, c);
             auto const j = stdr::find(i + 1, end(), c);

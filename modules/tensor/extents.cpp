@@ -28,6 +28,7 @@ module;
 
 module ttl:extents;
 import :concepts;
+import :imap;
 import :tensor_traits;
 
 namespace stdr = std::ranges;
@@ -100,13 +101,40 @@ namespace ttl
             -> ARROW( FWD(t).extents() );
     } extents;
 
+    template <class T>
+    using extents_type = std::decay_t<std::invoke_result_t<_extents_fn, T>>;
+
     namespace concepts
     {
         template <class T>
         concept has_extents = requires (T&& t) {
             { ttl::extents(FWD(t)) } -> extents;
         };
+
+        template <class, std::size_t>
+        inline constexpr bool _is_static_extent = false;
+
+        template <concepts::extents Extents, std::size_t i>
+        inline constexpr bool _is_static_extent<Extents, i> = std::decay_t<Extents>::static_extent(i) != std::dynamic_extent;
+
+        template <class T, std::size_t i>
+        concept is_static_extent = has_extents<T> and _is_static_extent<extents_type<T>, i>;
     }
+
+    template <std::size_t i>
+    struct _extent_fn
+    {
+        template <concepts::has_extents T>
+        static constexpr auto operator()(T&& t) ->
+            ARROW( extents(t).extent(i) );
+
+        template <concepts::is_static_extent<i> T>
+        static constexpr auto operator()(T&&) ->
+            ARROW( extents_type<T>::static_extent(i) );
+    };
+
+    template <std::size_t i>
+    inline constexpr _extent_fn<i> extent;
 
     /// Utilities for dealing with std::extents.
     ///@{
@@ -128,10 +156,17 @@ namespace ttl
     template <std::size_t... i, class T, std::size_t... ts>
     inline constexpr auto select_extents(std::index_sequence<i...>, std::extents<T, ts...> const& t)
     {
-        static constexpr std::size_t Rank = sizeof...(ts);
-        static constexpr std::array<size_t, Rank> es { ts... };
+        // @todo[c++26]
+        static constexpr std::size_t es[]{ts...};
+        // static constexpr std::size_t Rank = sizeof...(ts);
+        // static constexpr std::array<size_t, Rank> es { ts... };
         return std::extents<std::size_t, es[i]...> { t.extent(i)... };
     }
+
+    /// Select a subset of extents for an index map.
+    template <istring from, istring to, class T, std::size_t... es>
+    inline constexpr auto select_extents(std::extents<T, es...> const& extents) ->
+        ARROW ( select_extents(imap<from, to>, extents) );
 
     /// Check to see if two extents are compatible.
     ///

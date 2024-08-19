@@ -51,6 +51,21 @@ namespace ttl
             return out;
         }
 
+        /// Check to see if this is a subset of b.
+        template <std::size_t M>
+        constexpr bool is_subset_of(istring<M> const& b) const
+        {
+            return std::ranges::all_of(*this, [&](char const c) {
+                return b.count(c) != 0;
+            });
+        }
+
+        /// Check to see if a is a permutation of b.
+        template <std::size_t M>
+        friend constexpr bool is_permutation(istring const& a, istring<M> const& b) {
+            return a.is_subset_of(b) and b.is_subset_of(a);
+        }
+
       private:
         constexpr auto _unique(auto *out) const -> auto* {
             return stdr::copy_if(*this, out, [this](auto const& c) {
