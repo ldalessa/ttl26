@@ -26,7 +26,7 @@ namespace ttl
     {
         template <class T>
         concept has_extents_trait = requires (T&& t) {
-            { tensor_traits<std::decay_t<T>>::extents(FWD(t)) } -> concepts::extents;
+            { tensor_traits<std::decay_t<T>>::extents(FWD(t)) } -> extents;
         };
 
         template <class T, class... I>
@@ -36,10 +36,12 @@ namespace ttl
 
         template <class T>
         concept has_rank_trait = requires {
-            { tensor_traits<std::decay_t<T>>::rank() } -> std::convertible_to<std::size_t>;
+            { tensor_traits<std::decay_t<T>>::rank } -> concepts::integral_constant;
         };
     }
 }
+
+using namespace ttl::concepts;
 
 namespace
 {
@@ -56,11 +58,9 @@ struct ttl::tensor_traits<S> {
         return 0;
     }
 
-    static constexpr auto rank() -> std::size_t {
-        return 1;
-    }
+    static constexpr std::integral_constant<std::size_t, 1> rank;
 };
 
-static_assert(ttl::concepts::has_extents_trait<S>);
-static_assert(ttl::concepts::has_evaluate_trait<S, int>);
-static_assert(ttl::concepts::has_rank_trait<S>);
+static_assert(has_extents_trait<S>);
+static_assert(has_evaluate_trait<S, int>);
+static_assert(has_rank_trait<S>);

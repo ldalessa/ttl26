@@ -4,6 +4,7 @@ module;
 #include <concepts>
 #include <mdspan>
 #include <ranges>
+#include <utility>
 #include <vector>
 
 module ttl:concepts;
@@ -72,5 +73,13 @@ namespace ttl::concepts
     template <class T>
     concept extents = requires (T t) {
         check_std_extents(t);
+    };
+
+    template <class T, T N>
+    void check_integral_constant(std::integral_constant<T, N>);
+
+    template <class T>
+    concept integral_constant = requires (T t) {
+        check_integral_constant(t);
     };
 }

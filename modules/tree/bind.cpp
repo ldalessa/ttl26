@@ -1,7 +1,9 @@
 module;
 
+#include <array>
 #include <cstdio>
 #include <utility>
+#include <vector>
 
 module ttl:bind;
 import :expression;
@@ -18,26 +20,22 @@ namespace ttl::tree
         static constexpr auto _outer = _index.outer();
         static constexpr auto _inner = _index.inner();
         static constexpr auto _all = _index.all();
-        static constexpr auto _rank = _outer.rank();
 
         A _a;
         index<_index> _i{};
 
-        constexpr bind(A a, ttl::index<_index> i)
+        template <istring... _>
+        constexpr bind(A a, index<_>... is)
                 : _a(a)
-                , _i(i)
-        {}
+                , _i((index<"">{} + ... + is))
+        {
+            static_assert((istring{""} + ... + _) == _index);
+        }
 
-        constexpr bind(A a) requires (_index.n_projected() == 0)
-                : _a(a)
-        {}
+        static constexpr auto rank = rank_v<_outer.rank()>;
 
         static constexpr auto outer() {
             return _outer;
-        }
-
-        static constexpr auto rank() -> std::size_t {
-            return _rank;
         }
     };
 
@@ -55,7 +53,8 @@ using namespace ttl::tree;
 
 static constexpr bool check_bind()
 {
-    using ttl::index;
+    ttl::index<"i"> i;
+    ttl::index<"j"> j;
 
     int a = 0;
     bind _{a};
@@ -63,8 +62,37 @@ static constexpr bool check_bind()
     bind _{std::move(a)};
     bind _{std::move(std::as_const(a))};
 
-    // int x[3]{};
-    // bind<int(&)[3], "i"> b(x);
+    int b[3]{};
+    bind _{b, i};
+    bind _{std::as_const(b), i};
+
+    std::array c = { 1, 2, 3 };
+    bind _{c, i};
+    bind _{std::as_const(c), i};
+    bind _{std::move(c), i };
+    bind _{std::move(std::as_const(c)), i };
+
+    std::vector d = { 1, 2, 3 };
+    bind _{d, i};
+    bind _{std::as_const(d), i};
+    bind _{std::move(d), i };
+    bind _{std::move(std::as_const(d)), i };
+
+    int e[3][3]{};
+    bind _{e, i ,j};
+    bind _{std::as_const(e), i, j};
+
+    std::array<std::array<int, 3>, 3> f{};
+    bind _{f, i, j};
+    bind _{std::as_const(f), i, j};
+    bind _{std::move(f), i, j};
+    bind _{std::move(std::as_const(f)), i, j};
+
+    bind _{f, i + j };
+    bind _{std::as_const(f), i + j };
+    bind _{std::move(f), i + j };
+    bind _{std::move(std::as_const(f)), i + j };
+
     return true;
 }
 

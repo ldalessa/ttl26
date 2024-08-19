@@ -7,6 +7,7 @@ module;
 #include <mdspan>
 #include <span>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 module ttl:rank;
@@ -17,25 +18,31 @@ namespace stdr = std::ranges;
 
 namespace ttl
 {
+    template <std::size_t N>
+    using rank_t = std::integral_constant<std::size_t, N>;
+
+    template <std::size_t N>
+    inline constexpr rank_t<N> rank_v;
+
     template <class T>
-    inline constexpr std::size_t rank = []
+    inline constexpr auto rank = []
     {
         using U = std::remove_cvref_t<T>;
         if constexpr (std::integral<U> or std::floating_point<U>) {
-            return 0zu;
+            return rank_v<0zu>;
         }
         else if constexpr (concepts::has_rank_trait<T>) {
-            return tensor_traits<U>::rank();
+            return tensor_traits<U>::rank;
         }
         else if constexpr (stdr::range<U>) {
-            return rank<stdr::range_value_t<U>> + 1zu;
+            return rank_v<rank<stdr::range_value_t<U>> + 1zu>;
         }
         else if constexpr (concepts::mdspan<U>) {
-            return rank<typename U::element_type> + U::extents_type::rank();
+            return rank_v<rank<typename U::element_type> + U::extents_type::rank()>;
         }
         else {
             using extents_type = std::invoke_result_t<_extents_fn, U>;
-            return std::decay_t<extents_type>::rank();
+            return rank_v<std::decay_t<extents_type>::rank()>;
         }
     }();
 }
