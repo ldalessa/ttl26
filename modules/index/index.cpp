@@ -48,13 +48,13 @@ namespace ttl
         }
     }
 
-    namespace concepts
-    {
-        template <class T>
-        concept index = requires {
-            typename std::decay_t<T>::_ttl_index_tag_type;
-        };
-    }
+    // namespace concepts
+    // {
+    //     template <class T>
+    //     concept index = requires {
+    //         typename std::decay_t<T>::_ttl_index_tag_type;
+    //     };
+    // }
 }
 
 #undef NDEBUG

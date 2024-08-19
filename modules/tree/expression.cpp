@@ -15,9 +15,9 @@ namespace ttl::tree
     {
         /// Rebind an expression. This is implemented in bind.cpp in order to
         /// break the circular dependency.
-        template <class T, istring... str>
-        constexpr auto operator()(this T&& self, index<str>...)
-            -> bind<T, (str + ...)>;
+        // template <class T, istring... str>
+        // constexpr auto operator()(this T&& self, index<str>...)
+        //     -> bind<T, (str + ...)>;
 
         /// Rebind an expression.
         // template <class T>

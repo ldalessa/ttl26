@@ -4,8 +4,10 @@ module;
 #include <cassert>
 #include <cstddef>
 
-export module ttl:istring;
+module ttl:istring;
 import :cstring;
+
+namespace stdr = std::ranges;
 
 namespace ttl
 {
@@ -20,6 +22,16 @@ namespace ttl
         using istring::cstring::cstring;
 
         static constexpr auto projected = projection[0];
+
+        constexpr auto rank() const -> std::size_t {
+            return stdr::count_if(*this, [this](auto const& c) {
+                return this->count(c) == 1;
+            });
+        }
+
+        constexpr auto n_projected() const -> std::size_t {
+            return this->count(projected);
+        }
 
         constexpr auto outer() const -> istring {
             istring out;
@@ -41,7 +53,7 @@ namespace ttl
 
       private:
         constexpr auto _unique(auto *out) const -> auto* {
-            return std::ranges::copy_if(*this, out, [this](auto const& c) {
+            return stdr::copy_if(*this, out, [this](auto const& c) {
                 return this->count(c) == 1;
             }).out;
         }
@@ -54,7 +66,7 @@ namespace ttl
             auto const* i = out;
             for (auto const c : *this) {
                 if (this->count(c) == 2) {
-                    if (std::ranges::count(i, out, c) == 0) {
+                    if (stdr::count(i, out, c) == 0) {
                         *out++ = c;
                     }
                 }
@@ -63,7 +75,7 @@ namespace ttl
         }
 
         constexpr auto _projected(auto *out) const -> auto* {
-            return std::ranges::copy_if(*this, out, [](auto const c) {
+            return stdr::copy_if(*this, out, [](auto const c) {
                 return c == projected;
             }).out;
         }
