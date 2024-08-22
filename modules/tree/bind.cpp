@@ -347,8 +347,22 @@ static constexpr bool check_bind_evaluate_contraction()
     return true;
 }
 
+static constexpr bool check_bind_evaluate_scalar()
+{
+    int a = 0;
+    bind A(a);
+    assert(0 == A);
+
+    int b[2][2]{};
+    bind B(b, i, i);
+    assert(0 == B);
+
+    return true;
+}
+
 static_assert(check_bind_ctad());
 static_assert(check_bind_extents());
 static_assert(check_bind_evaluate_plain());
 static_assert(check_bind_evaluate_projection());
 static_assert(check_bind_evaluate_contraction());
+static_assert(check_bind_evaluate_scalar());
