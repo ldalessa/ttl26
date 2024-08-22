@@ -1,5 +1,9 @@
 module;
 
+#include <cstddef>
+#include <mdspan>
+#include <utility>
+
 module ttl:expression;
 import :extents;
 import :index;
@@ -23,5 +27,31 @@ namespace ttl::tree
         // template <class T>
         // constexpr auto operator()(this T&& self, is_index auto... i)
         //     -> ARROW( __fwd(self)[index(i)...] );
+      protected:
+        template <istring index, class Extents>
+        static constexpr bool _check_contracted_extents_static = [] {
+            for (auto const c : index.contracted()) {
+                auto [i, j] = index.index_of_2(c);
+                auto a = Extents::static_extent(i);
+                auto b = Extents::static_extent(j);
+                if (a != std::dynamic_extent and b != std::dynamic_extent and a != b) {
+                    return false;
+                }
+            }
+            return true;
+        }();
+
+        /// Check that contracted indices have the same extents.
+        template <istring index, std::size_t... es>
+        static constexpr bool _check_contracted_extents_dynamic(std::extents<std::size_t, es...> const& extents)
+        {
+            for (auto const c : index.contracted()) {
+                auto [i, j] = index.index_of_2(c);
+                if (extents.extent(i) != extents.extent(j)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     };
 }

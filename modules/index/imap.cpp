@@ -1,10 +1,11 @@
 module;
 
 #include <array>
+#include <cassert>
+#include <concepts>
 #include <utility>
 
 module ttl:imap;
-import :concepts;
 import :istring;
 
 namespace ttl
@@ -13,7 +14,7 @@ namespace ttl
     ///
     /// This means if `from[i] -> to[j]` then `map[j] == i`.
     template <istring from, istring to>
-    inline constexpr concepts::index_sequence auto imap = []
+    inline constexpr std::integer_sequence imap = []
     {
         static_assert(to.is_subset_of(from));
 
@@ -34,8 +35,22 @@ namespace ttl
             return out;
         }();
 
-        return []<std::size_t... i>(std::index_sequence<i...>) {
-            return std::index_sequence<map[i]...>();
-        }(std::make_index_sequence<size>());
+        return to_sequence<map>;
     }();
 }
+
+using namespace ttl;
+
+#undef DNDEBUG
+
+static constexpr bool test_imap()
+{
+    constexpr istring all = "i*";
+    constexpr auto map = imap<all, all>;
+    // print<map> _;
+    // assert((std::same_as<decltype(auto(map)), std::integer_sequence<unsigned long,0,1>>));
+
+    return true;
+}
+
+static_assert(test_imap());

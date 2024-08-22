@@ -101,8 +101,43 @@ namespace ttl
             -> ARROW( FWD(t).extents() );
     } extents;
 
+    /// The extents_type metafunction infers the type of the extents.
+    ///
+    /// The default implementation is to use invoke_return_t with the type,
+    /// however this can be expensive at runtime so we allow the client to
+    /// customize the extents_type either with a tensor_trait or with a type
+    /// alias.
+    namespace _extents_type
+    {
+        template <class T>
+        using tensor_trait_t = tensor_traits<std::decay_t<T>>::extents_type;
+
+        template <class T>
+        using member_t = std::decay_t<T>::extents_type;
+
+        template <class T>
+        struct impl
+        {
+            using type = std::decay_t<std::invoke_result_t<_extents_fn, T>>;
+        };
+
+        template <class T>
+            requires concepts::extents<tensor_trait_t<T>>
+        struct impl<T>
+        {
+            using type = tensor_trait_t<T>;
+        };
+
+        template <class T>
+            requires (not concepts::extents<tensor_trait_t<T>> and concepts::extents<member_t<T>>)
+        struct impl<T>
+        {
+            using type = member_t<T>;
+        };
+    }
+
     template <class T>
-    using extents_type = std::decay_t<std::invoke_result_t<_extents_fn, T>>;
+    using extents_type = _extents_type::impl<T>::type;
 
     namespace concepts
     {
@@ -158,8 +193,6 @@ namespace ttl
     {
         // @todo[c++26]
         static constexpr std::size_t es[]{ts...};
-        // static constexpr std::size_t Rank = sizeof...(ts);
-        // static constexpr std::array<size_t, Rank> es { ts... };
         return std::extents<std::size_t, es[i]...> { t.extent(i)... };
     }
 
@@ -303,6 +336,9 @@ static_assert(has_extents<std::vector<std::array<int[3], 3>>>);
 static_assert(has_extents<std::mdspan<int, std::extents<std::size_t>>>);
 static_assert(has_extents<std::mdspan<int, std::extents<std::size_t, 1>>>);
 static_assert(has_extents<std::mdspan<int, std::extents<std::size_t, 2, 3>>>);
+
+static_assert(not has_extents<std::extents<std::size_t>>);
+static_assert(not is_static_extent<std::extents<std::size_t, 1>, 0>);
 
 static constexpr bool check_extents()
 {

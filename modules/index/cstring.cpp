@@ -1,9 +1,11 @@
 module;
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <concepts>
 #include <cstddef>
+#include <iterator>
 
 module ttl:cstring;
 
@@ -87,20 +89,38 @@ namespace ttl
             return FWD(self)._data[i];
         }
 
-        constexpr auto count(concepts::character auto const c) const ->
+        constexpr auto count(concepts::character auto c) const ->
             std::size_t
         {
             return stdr::count(*this, c);
         }
 
-        constexpr auto index_of_1(concepts::character auto const c) const ->
-            std::size_t
+        constexpr auto index_of(concepts::character auto c, std::output_iterator<std::size_t> auto o) const
         {
+            auto const b = begin();
+            auto const e = end();
+            for (auto i = b; i != e; ++i) {
+                if (*i == c) {
+                    *o++ = std::ranges::distance(b, i);
+                }
+            }
+            return o;
+        }
+
+        template <std::size_t M>
+        constexpr auto index_of(concepts::character auto c) const
+            -> std::array<std::size_t, M>
+        {
+            std::array<std::size_t, M> out;
+            index_of(c, out.begin());
+            return out;
+        }
+
+        constexpr auto index_of_1(concepts::character auto c) const -> std::size_t {
             return stdr::find(*this, c) - _data;
         }
 
-        constexpr auto index_of_1_nth(concepts::character auto const c, std::size_t const n) const ->
-            std::size_t
+        constexpr auto index_of_1_nth(concepts::character auto c, std::size_t const n) const -> std::size_t
         {
             std::size_t i = 0;
             return stdr::find_if(*this, [&](char_t const d) {
@@ -108,23 +128,10 @@ namespace ttl
             }) - _data;
         }
 
-        struct _index_of_2_result
+        constexpr auto index_of_2(concepts::character auto c) const
         {
-            std::ptrdiff_t _data[2]{};
-            constexpr auto operator[](std::size_t const i) const -> std::size_t {
-                return _data[i];
-            }
-        };
-
-        constexpr auto index_of_2(concepts::character auto const c) const ->
-            _index_of_2_result
-        {
-            auto const i = stdr::find(*this, c);
-            auto const j = stdr::find(i + 1, end(), c);
-            return {
-                i - _data,
-                j - _data
-            };
+            assert(count(c) == 2);
+            return this->template index_of<2>(c);
         }
 
       private:
@@ -139,6 +146,19 @@ namespace ttl
             return out;
         }
     };
+
+    /// Find the indices of all `c` in `str`.
+    ///
+    /// This "right-sizes" the output in order to produce a compacted
+    /// vector. This is why the `str` is taken as a CNTTP.
+    template <cstring str, concepts::character auto c>
+    inline constexpr std::array index_of = str.template index_of<str.count(c)>(c);
+
+    /// Convert an array to an integer sequence.
+    template <std::array a>
+    inline constexpr std::integer_sequence to_sequence = []<std::size_t... i>(std::index_sequence<i...>) {
+        return std::integer_sequence<typename decltype(a)::value_type, a[i]...>();
+    }(std::make_index_sequence<a.size()>());
 }
 
 using namespace ttl;
@@ -150,7 +170,6 @@ template <class T, class U>
 static constexpr auto cstring_indexable_with = requires (T t, U u) {
     t.count(u);
     t.index_of_1(u);
-    t.index_of_2(u);
 };
 
 static constexpr bool test_cstring()
@@ -166,8 +185,6 @@ static constexpr bool test_cstring()
     assert(i[1] == '\0');
     assert(i.index_of_1('i') == 0);
     assert(i.index_of_1('j') == i.size());
-    assert(i.index_of_2('i')[0] == 0);
-    assert(i.index_of_2('i')[1] == i.size());
 
     constexpr auto ii = i + i;
     assert(ii.size() == 2);
@@ -188,10 +205,8 @@ static constexpr bool test_cstring()
     assert(jiik.index_of_1('i') == 1);
     assert(jiik.index_of_1('k') == 3);
     assert(jiik.index_of_1('l') == jiik.size());
-    assert(jiik.index_of_2('j')[0] == 0);
     assert(jiik.index_of_2('i')[0] == 1);
     assert(jiik.index_of_2('i')[1] == 2);
-    assert(jiik.index_of_2('k')[0] == 3);
 
     constexpr cstring μ = u"μ";
     static_assert(cstring_indexable_with<decltype(μ), char>);
@@ -202,6 +217,12 @@ static constexpr bool test_cstring()
     assert(μ.size() == 1);
     assert(μ[0] == u'μ');
     assert(μ.index_of_1(u'μ') == 0);
+
+    constexpr cstring test = "test";
+    constexpr std::array map = index_of<test, 't'>;
+    assert(map.size() == 2);
+    assert(map[0] == 0);
+    assert(map[1] == 3);
 
     return true;
 }

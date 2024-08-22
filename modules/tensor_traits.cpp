@@ -21,6 +21,12 @@ namespace ttl
     ///
     ///     @optional
     ///     static constexpr auto rank() -> std::size_t
+    ///
+    ///     @optional
+    ///     using extents_type = ...;
+    ///
+    ///     @optional
+    ///     using scalar_type = ...;
     /// };
     namespace concepts
     {
