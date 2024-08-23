@@ -13,21 +13,41 @@ import :tensor;
 
 namespace ttl::tree
 {
+    /// Forward declare the bind tree node type, and provide the type deduction
+    /// for it. This lets us hoist rebinding into the expression base class. The
+    /// :bind module imports :expression in order to inherit from the expression
+    /// type, so these deduction guides are available there.
+    ///
+    /// expression::_rebind is implemented in bind.cpp, once the bind
+    /// constructor is actually available.
+    ///
+    /// @{
     template <tensor, istring>
     struct bind;
 
+    template <class A, istring... is>
+    bind(A&, index<is>...) -> bind<A&, (istring{""} + ... + is)>;
+
+    template <class A, istring... is>
+    bind(A const&&, index<is>...) -> bind<A const, (istring{""} + ... + is)>;
+
+    template <class A, class I, class... Is>
+        requires (std::integral<I> or ... or std::integral<Is>)
+    bind(A&, I, Is...) -> bind<A&, (to_istring<I> + ... + to_istring<Is>)>;
+
+    template <class A, class I, class... Is>
+        requires (std::integral<I> or ... or std::integral<Is>)
+    bind(A const&&, I, Is...) -> bind<A const, (to_istring<I> + ... + to_istring<Is>)>;
+    /// @}
+
     struct expression
     {
-        /// Rebind an expression. This is implemented in bind.cpp in order to
-        /// break the circular dependency.
-        // template <class T, istring... str>
-        // constexpr auto operator()(this T&& self, index<str>...)
-        //     -> bind<T, (str + ...)>;
+        /// Indexing should use operator[]
+        constexpr auto operator()(this auto&&, std::integral auto...) = delete;
 
         /// Rebind an expression.
-        // template <class T>
-        // constexpr auto operator()(this T&& self, is_index auto... i)
-        //     -> ARROW( __fwd(self)[index(i)...] );
+        constexpr auto operator()(this auto&& self, auto... is)
+            -> ARROW( FWD(self)._rebind(index(is)...) );
 
         /// Allow scalar expressions to decay to their scalar value.
         ///
@@ -40,6 +60,23 @@ namespace ttl::tree
         }
 
       protected:
+        /// Rebind an expression.
+        ///
+        /// This is implemented in :bind in order to break the circular
+        /// dependency.
+        ///
+        /// @note The expression type T is needed in the implementation to
+        ///       verify that the rebound indices cover the current indices, so
+        ///       it has to be declared in this form rather than using an
+        ///       abbreviated form.
+        template <ttl::expression T, istring... str>
+        constexpr auto _rebind(this T&& self, index<str>... is)
+            -> decltype(bind(FWD(self), is...));
+
+        /// Check that contracted extents are statically compatible.
+        ///
+        /// Contracted extents i and j are  "statically compatible" if either
+        /// static_extent is std::dynamic range, or if the extents are equal.
         template <istring index, class Extents>
         static constexpr bool _check_contracted_extents_static = [] {
             for (auto const c : index.contracted()) {

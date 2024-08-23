@@ -4,6 +4,7 @@ module;
 #include <cassert>
 #include <cstdio>
 #include <mdspan>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -12,6 +13,8 @@ import :concepts;
 import :expression;
 import :index;
 import :tensor;
+
+namespace stdv = std::views;
 
 namespace ttl::tree
 {
@@ -108,20 +111,32 @@ namespace ttl::tree
         }
     };
 
-    // Type deduction for binds.
-    template <class A, istring... is>
-    bind(A&, index<is>...) -> bind<A&, (istring{""} + ... + is)>;
+    template <ttl::expression T, istring... str>
+    constexpr auto expression::_rebind(this T&& self, index<str>... is)
+        -> decltype( bind(FWD(self), is...) )
+    {
+        // Make sure that this rebinding makes sense.
+        static constexpr istring outer = ttl::outer<T>;
+        static constexpr istring next = (istring{""} + ... + str);
 
-    template <class A, istring... is>
-    bind(A const&&, index<is>...) -> bind<A const, (istring{""} + ... + is)>;
+        // We need one index for each slot.
+        static_assert(outer.size() == next.size());
 
-    template <class A, class I, class... Is>
-        requires (std::integral<I> or ... or std::integral<Is>)
-    bind(A&, I, Is...) -> bind<A&, (to_istring<I> + ... + to_istring<Is>)>;
+        // Any non-projected index, i, that appears uncontracted in next needs
+        // to match the index in the same slot of outer.
+        static_assert([] {
+            for (auto const& [i, j] : stdv::zip(next, outer)) {
+                if (i == j) continue;              // match
+                if (i == next.projected) continue; // projection
+                if (0 == outer.count(i)) continue; // good rebind
+                if (2 == next.count(i)) continue;  // contraction
+                return false;
+            }
+            return true;
+        }());
 
-    template <class A, class I, class... Is>
-        requires (std::integral<I> or ... or std::integral<Is>)
-    bind(A&&, I, Is...) -> bind<A const, (to_istring<I> + ... + to_istring<Is>)>;
+        return bind(FWD(self), is...);
+    }
 }
 
 using namespace ttl::tree;
@@ -360,9 +375,36 @@ static constexpr bool check_bind_evaluate_scalar()
     return true;
 }
 
+static constexpr bool check_bind_rebind()
+{
+    ttl::index<"k"> k;
+    ttl::index<"l"> l;
+
+    {
+        int a[2][2]{{1,2}, {3,4}};
+        bind A(a, i, j);
+        bind B = A(i, j); // should be fine because indices match
+        bind C = B(k, l);
+        assert((a[0][0] == C[0,0]));
+        assert((a[0][1] == C[0,1]));
+        assert((a[1][0] == C[1,0]));
+        assert((a[1][1] == C[1,1]));
+    }
+
+    {
+        int a[2][2][2]{};
+        bind A(a, i, j, k);
+        bind B = A(i, l, l);
+        assert(0 == B[0]);
+    }
+
+    return true;
+}
+
 static_assert(check_bind_ctad());
 static_assert(check_bind_extents());
 static_assert(check_bind_evaluate_plain());
 static_assert(check_bind_evaluate_projection());
 static_assert(check_bind_evaluate_contraction());
 static_assert(check_bind_evaluate_scalar());
+static_assert(check_bind_rebind());
