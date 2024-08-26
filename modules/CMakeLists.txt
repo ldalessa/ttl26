@@ -24,5 +24,5 @@ target_compile_options(ttl PUBLIC
 
 target_compile_features(ttl PUBLIC cxx_std_26)
 
-# add_executable(demo main.cpp)
-# target_link_libraries(demo PRIVATE ttl)
+add_executable(test_exports main.cpp)
+target_link_libraries(test_exports PRIVATE ttl)

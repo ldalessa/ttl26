@@ -10,6 +10,8 @@ module;
 #include <vector>
 
 export module ttl:tspan;
+import :bind;
+import :index;
 
 namespace stdr = std::ranges;
 
@@ -77,12 +79,8 @@ export namespace ttl
         /// mdspan and have it work properly for things bound via the tspan.
         ///
         /// Copying the mdspan is going to be cheap since it's non- owning.
-        // constexpr auto operator()(this auto&& self, is_index auto... i)
-        //     -> decltype(ttl::bind(typename tspan::mdspan(__fwd(self)), ttl::index(i)...))
-        // {
-        //     static_assert(sizeof...(i) == Extents::rank());
-        //     return ttl::bind(typename tspan::mdspan(__fwd(self)), ttl::index(i)...);
-        // }
+        constexpr auto operator()(this auto&& self, auto... is)
+            -> ARROW ( ttl::tree::bind(FWD(self), is...) );
     };
 
     /// Infer the scalar type and static extents for a c-array.
@@ -147,7 +145,12 @@ export namespace ttl
 
 #undef DNDEBUG
 
-static constexpr bool check_c_array()
+static_assert(ttl::scalar<ttl::tspan<int, std::extents<std::size_t>>>);
+static_assert(ttl::tensor<ttl::tspan<int, std::extents<std::size_t, 3>>>);
+static_assert(ttl::tensor<ttl::tspan<int, std::extents<std::size_t, 3, 3>>>);
+static_assert(ttl::tensor<ttl::tspan<int, std::extents<std::size_t, std::dynamic_extent, std::dynamic_extent>>>);
+
+static constexpr bool check_tspan_c_array()
 {
     int a[16]{};
 
@@ -244,7 +247,7 @@ static constexpr bool check_c_array()
     return true;
 }
 
-static constexpr bool check_array()
+static constexpr bool check_tspan_array()
 {
     std::array<int, 16> a{};
 
@@ -373,7 +376,7 @@ static constexpr bool check_array()
     return true;
 }
 
-static constexpr bool check_vector()
+static constexpr bool check_tspan_vector()
 {
     std::vector<int> a(16);
     ttl::tspan _(a);
@@ -424,7 +427,7 @@ static constexpr bool check_vector()
     return true;
 }
 
-static constexpr bool check_new()
+static constexpr bool check_tspan_new()
 {
     int *a = new int[16]{};
 
@@ -468,7 +471,19 @@ static constexpr bool check_new()
     return true;
 }
 
-static_assert(check_c_array());
-static_assert(check_array());
-static_assert(check_vector());
-static_assert(check_new());
+static constexpr bool check_tspan_bind()
+{
+    ttl::index<"i"> i;
+    ttl::index<"j"> j;
+
+    int a[16]{};
+    ttl::tspan A(a, 4, 4);
+    ttl::tree::bind B = A(i,j);
+    return true;
+}
+
+static_assert(check_tspan_c_array());
+static_assert(check_tspan_array());
+static_assert(check_tspan_vector());
+static_assert(check_tspan_new());
+static_assert(check_tspan_bind());

@@ -29,6 +29,7 @@ module;
 module ttl:extents;
 import :concepts;
 import :imap;
+import :istring;
 import :tensor_traits;
 
 namespace stdr = std::ranges;

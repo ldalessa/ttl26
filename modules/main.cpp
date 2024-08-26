@@ -1,8 +1,10 @@
 import ttl;
 
-// using namespace ttl::literals;
-
 int main() {
     ttl::index<"i"> i;
-    // auto i = "i"_ind;
+    ttl::index<"j"> j;
+
+    int a[16]{};
+    ttl::tspan A(a, 4, 4);
+    auto B = A(i,j);
 }

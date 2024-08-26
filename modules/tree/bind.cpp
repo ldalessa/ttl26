@@ -12,6 +12,7 @@ module ttl:bind;
 import :concepts;
 import :expression;
 import :index;
+import :istring;
 import :tensor;
 
 namespace stdv = std::views;

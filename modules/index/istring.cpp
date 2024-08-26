@@ -5,7 +5,7 @@ module;
 #include <cassert>
 #include <cstddef>
 
-module ttl:istring;
+export module ttl:istring;
 import :cstring;
 
 namespace stdr = std::ranges;
@@ -17,6 +17,7 @@ namespace ttl
     /// An index string.
     ///
     /// Extents the cstring with functions specific to tensor indices.
+    export // @todo[https://github.com/llvm/llvm-project/issues/105882]
     template <std::size_t N>
     struct istring : cstring<N>
     {
