@@ -1,12 +1,11 @@
-cmake_minimum_required(VERSION 3.30.2)
+cmake_minimum_required(VERSION 4.0.2)
 
-set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_FLAGS "-stdlib=libc++")
-set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "0e5b6991-d74f-4b3d-a41c-cf096e0b2508")
-
-project(ttl CXX)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} ${CXXFLAGS}")
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "a9e1cf81-9932-4810-974b-6eccaf14e457")
+set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 set(CMAKE_CXX_MODULE_STD 1)
+project(ttl CXX)
+unset(CMAKE_CXX_FLAGS)
 
 add_subdirectory(ttl)
