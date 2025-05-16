@@ -1,18 +1,9 @@
-module;
-
-#include <array>
-#include <concepts>
-#include <cstdint>
-#include <mdspan>
-#include <ranges>
-#include <utility>
-#include <vector>
-
 export module ttl:tensor;
-import :extents;
-import :evaluate;
-import :outer;
-import :rank;
+export import :extents;
+export import :evaluate;
+export import :outer;
+export import :rank;
+import std;
 
 namespace ttl
 {

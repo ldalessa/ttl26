@@ -1,11 +1,6 @@
-module;
-
-#include <concepts>
-#include <mdspan>
-#include <type_traits>
-
 export module ttl:tensor_traits;
-import :concepts;
+export import :concepts;
+import std;
 
 namespace ttl
 {

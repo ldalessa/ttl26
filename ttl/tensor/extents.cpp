@@ -17,20 +17,13 @@
 ///    contatenation and selection of extents.
 ///
 module;
-
-#include <algorithm>
 #include <cassert>
-#include <cstddef>
-#include <mdspan>
-#include <ranges>
-#include <type_traits>
-#include <vector>
-
 export module ttl:extents;
-import :concepts;
-import :imap;
-import :istring;
-import :tensor_traits;
+export import :concepts;
+export import :imap;
+export import :istring;
+export import :tensor_traits;
+import std;
 
 namespace stdr = std::ranges;
 
@@ -217,8 +210,8 @@ namespace ttl
     inline constexpr bool compatible_extents(std::extents<T, as...> const& a, std::extents<T, bs...> const& b)
     {
         /// 1. Extents should be the same length.
-        static constexpr size_t N = sizeof...(as);
-        static constexpr size_t M = sizeof...(bs);
+        static constexpr std::size_t N = sizeof...(as);
+        static constexpr std::size_t M = sizeof...(bs);
         static_assert(N == M);
 
         /// 2. Each static extent needs to be the same, or std::dynamic_extent.

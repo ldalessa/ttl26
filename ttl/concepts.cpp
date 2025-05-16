@@ -1,14 +1,5 @@
-module;
-
-#include <array>
-#include <concepts>
-#include <mdspan>
-#include <ranges>
-#include <type_traits>
-#include <utility>
-#include <vector>
-
 export module ttl:concepts;
+import std;
 
 namespace ttl::concepts
 {

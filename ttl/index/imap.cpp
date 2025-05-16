@@ -1,12 +1,6 @@
-module;
-
-#include <array>
-#include <cassert>
-#include <concepts>
-#include <utility>
-
 export module ttl:imap;
-import :istring;
+export import :istring;
+import std;
 
 namespace ttl
 {

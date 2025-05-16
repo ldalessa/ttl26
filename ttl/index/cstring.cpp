@@ -1,13 +1,9 @@
 module;
 
-#include <algorithm>
-#include <array>
 #include <cassert>
-#include <concepts>
-#include <cstddef>
-#include <iterator>
 
 export module ttl:cstring;
+import std;
 
 namespace stdr = std::ranges;
 

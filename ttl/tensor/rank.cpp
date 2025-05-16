@@ -1,19 +1,7 @@
-module;
-
-#include <array>
-#include <cstddef>
-#include <functional>
-#include <ranges>
-#include <mdspan>
-#include <ranges>
-#include <span>
-#include <type_traits>
-#include <utility>
-#include <vector>
-
 export module ttl:rank;
-import :extents;
-import :tensor_traits;
+export import :extents;
+export import :tensor_traits;
+import std;
 
 namespace stdr = std::ranges;
 

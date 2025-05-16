@@ -1,15 +1,10 @@
-module;
-
-#include <cstddef>
-#include <mdspan>
-#include <utility>
-
 export module ttl:expression;
-import :extents;
-import :evaluate;
-import :index;
-import :istring;
-import :tensor;
+export import :extents;
+export import :evaluate;
+export import :index;
+export import :istring;
+export import :tensor;
+import std;
 
 namespace ttl::tree
 {

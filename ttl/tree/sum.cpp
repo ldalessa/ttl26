@@ -1,3 +1,2 @@
-module;
-
-module ttl:sum;
+export module ttl:sum;
+import std;

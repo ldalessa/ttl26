@@ -1,11 +1,8 @@
-module;
-
-#include <type_traits>
-
 export module ttl:outer;
-import :index;
-import :istring;
-import :rank;
+export import :index;
+export import :istring;
+export import :rank;
+import std;
 
 namespace ttl
 {

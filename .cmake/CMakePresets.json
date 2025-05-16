@@ -4,9 +4,10 @@
         {
             "name": "ninja",
             "hidden": true,
-            "cacheVariables": {
-                "type": "STRING",
-                "CMAKE_GENERATOR": "Ninja"
+            "generator": "Ninja",
+            "environment": {
+                "CFLAGS": "-fdiagnostics-color=always",
+                "CXXFLAGS": "-fdiagnostics-color=always"
             }
         },
         {

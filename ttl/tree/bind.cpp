@@ -1,19 +1,12 @@
 module;
-
-#include <array>
 #include <cassert>
-#include <cstdio>
-#include <mdspan>
-#include <ranges>
-#include <utility>
-#include <vector>
-
 export module ttl:bind;
-import :concepts;
-import :expression;
-import :index;
-import :istring;
-import :tensor;
+export import :concepts;
+export import :expression;
+export import :index;
+export import :istring;
+export import :tensor;
+import std;
 
 namespace stdv = std::views;
 

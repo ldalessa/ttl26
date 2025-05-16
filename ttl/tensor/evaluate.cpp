@@ -1,17 +1,10 @@
 module;
-
-#include <array>
 #include <cassert>
-#include <concepts>
-#include <mdspan>
-#include <ranges>
-#include <type_traits>
-#include <utility>
-
 export module ttl:evaluate;
-import :concepts;
-import :rank;
-import :tensor_traits;
+export import :concepts;
+export import :rank;
+export import :tensor_traits;
+import std;
 
 namespace stdr = std::ranges;
 

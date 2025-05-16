@@ -1,17 +1,7 @@
-module;
-
-#include <array>
-#include <cassert>
-#include <cstddef>
-#include <mdspan>
-#include <ranges>
-#include <span>
-#include <type_traits>
-#include <vector>
-
 export module ttl:tspan;
-import :bind;
-import :index;
+export import :bind;
+export import :index;
+import std;
 
 namespace stdr = std::ranges;
 

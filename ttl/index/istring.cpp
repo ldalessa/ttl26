@@ -1,12 +1,8 @@
 module;
-
-#include <algorithm>
-#include <array>
 #include <cassert>
-#include <cstddef>
-
 export module ttl:istring;
-import :cstring;
+export import :cstring;
+import std;
 
 namespace stdr = std::ranges;
 
