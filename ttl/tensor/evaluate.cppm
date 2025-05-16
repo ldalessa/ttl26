@@ -19,7 +19,7 @@ namespace ttl
 		static constexpr auto operator()(T&& t) ->
 			ARROW( FWD(t) );
 
-		/// Evaluate any type that has the tensr_trait::evaluate defined.
+		/// Evaluate any type that has the tensor_trait::evaluate defined.
 		template <class T, std::integral... Is>
 			requires concepts::has_evaluate_trait<T, Is...>
 		static constexpr auto operator()(T&& t, Is... i) ->

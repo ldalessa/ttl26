@@ -27,12 +27,12 @@ namespace ttl::tree
 		A _a;
 		index<_index> _i{};
 
-		template <istring... _>
-		constexpr bind(A a, index<_>... is)
+		template <istring... indices>
+		constexpr bind(A a, index<indices>... is)
 				: _a(a)
 				, _i((index<"">{} + ... + is))
 		{
-			static_assert((istring{""} + ... + _) == _index);
+			static_assert((istring{""} + ... + indices) == _index);
 			assert(_check_contracted_extents_dynamic<_index>(ttl::extents(_a)));
 		}
 
@@ -45,7 +45,7 @@ namespace ttl::tree
 
 		static constexpr auto rank = std::integral_constant<std::size_t, _outer.rank()>();
 
-		static constexpr auto outer() {
+		static consteval auto outer() {
 			return _outer;
 		}
 
@@ -105,7 +105,7 @@ namespace ttl::tree
 		}
 	};
 
-	template <ttl::expression T, istring... str>
+	template <concepts::expression T, istring... str>
 	constexpr auto expression::_rebind(this T&& self, index<str>... is)
 		-> decltype( bind(FWD(self), is...) )
 	{

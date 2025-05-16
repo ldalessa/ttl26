@@ -5,7 +5,7 @@ export import :outer;
 export import :rank;
 import std;
 
-namespace ttl
+namespace ttl::concepts
 {
 	template <class T>
 	concept tensor = has_extents<T> and has_evaluate_n<T, rank<T>>;
@@ -18,6 +18,7 @@ namespace ttl
 }
 
 using namespace ttl;
+using namespace ttl::concepts;
 
 #undef DNDEBUG
 

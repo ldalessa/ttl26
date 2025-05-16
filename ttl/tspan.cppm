@@ -12,7 +12,8 @@ export namespace ttl
 		class Extents,
 		class LayoutPolicy = std::layout_right,
 		class AccessorPolicy = std::default_accessor<T>>
-	struct tspan : public std::mdspan<T, Extents, LayoutPolicy, AccessorPolicy> {
+	struct tspan : public std::mdspan<T, Extents, LayoutPolicy, AccessorPolicy>
+	{
 		/// Use all of the mdspan constructors.
 		using tspan::mdspan::mdspan;
 
@@ -135,10 +136,10 @@ export namespace ttl
 
 #undef DNDEBUG
 
-static_assert(ttl::scalar<ttl::tspan<int, std::extents<std::size_t>>>);
-static_assert(ttl::tensor<ttl::tspan<int, std::extents<std::size_t, 3>>>);
-static_assert(ttl::tensor<ttl::tspan<int, std::extents<std::size_t, 3, 3>>>);
-static_assert(ttl::tensor<ttl::tspan<int, std::extents<std::size_t, std::dynamic_extent, std::dynamic_extent>>>);
+static_assert(ttl::concepts::scalar<ttl::tspan<int, std::extents<std::size_t>>>);
+static_assert(ttl::concepts::tensor<ttl::tspan<int, std::extents<std::size_t, 3>>>);
+static_assert(ttl::concepts::tensor<ttl::tspan<int, std::extents<std::size_t, 3, 3>>>);
+static_assert(ttl::concepts::tensor<ttl::tspan<int, std::extents<std::size_t, std::dynamic_extent, std::dynamic_extent>>>);
 
 static constexpr bool check_tspan_c_array()
 {
