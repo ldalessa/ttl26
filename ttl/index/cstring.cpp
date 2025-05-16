@@ -7,7 +7,7 @@ module;
 #include <cstddef>
 #include <iterator>
 
-module ttl:cstring;
+export module ttl:cstring;
 
 namespace stdr = std::ranges;
 
