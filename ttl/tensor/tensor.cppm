@@ -7,14 +7,14 @@ import std;
 
 namespace ttl
 {
-    template <class T>
-    concept tensor = has_extents<T> and has_evaluate_n<T, rank<T>>;
+	template <class T>
+	concept tensor = has_extents<T> and has_evaluate_n<T, rank<T>>;
 
-    template <class T>
-    concept expression = tensor<T> and has_outer<T>;
+	template <class T>
+	concept expression = tensor<T> and has_outer<T>;
 
-    template <class T>
-    concept scalar = expression<T> and rank<T> == 0;
+	template <class T>
+	concept scalar = expression<T> and rank<T> == 0;
 }
 
 using namespace ttl;
