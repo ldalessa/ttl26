@@ -26,7 +26,7 @@ module;
 #include <type_traits>
 #include <vector>
 
-module ttl:extents;
+export module ttl:extents;
 import :concepts;
 import :imap;
 import :istring;

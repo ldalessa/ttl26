@@ -5,7 +5,7 @@ module;
 #include <concepts>
 #include <utility>
 
-module ttl:imap;
+export module ttl:imap;
 import :istring;
 
 namespace ttl

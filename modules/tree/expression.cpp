@@ -4,7 +4,7 @@ module;
 #include <mdspan>
 #include <utility>
 
-module ttl:expression;
+export module ttl:expression;
 import :extents;
 import :evaluate;
 import :index;

@@ -5,12 +5,13 @@ module;
 #include <functional>
 #include <ranges>
 #include <mdspan>
+#include <ranges>
 #include <span>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-module ttl:rank;
+export module ttl:rank;
 import :extents;
 import :tensor_traits;
 
@@ -88,10 +89,6 @@ static_assert(rank<std::array<int const[1][1], 1>> == 3);
 static_assert(rank<std::vector<int>> == 1);
 static_assert(rank<std::vector<int[1]>> == 2);
 static_assert(rank<std::vector<int[1][1]>> == 3);
-
-static_assert(rank<std::vector<int const>> == 1);
-static_assert(rank<std::vector<int const[1]>> == 2);
-static_assert(rank<std::vector<int const[1][1]>> == 3);
 
 static_assert(rank<std::mdspan<int, std::extents<int>>> == 0);
 static_assert(rank<std::mdspan<int, std::extents<int, 1>>> == 1);

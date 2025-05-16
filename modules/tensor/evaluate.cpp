@@ -8,7 +8,7 @@ module;
 #include <type_traits>
 #include <utility>
 
-module ttl:evaluate;
+export module ttl:evaluate;
 import :concepts;
 import :rank;
 import :tensor_traits;

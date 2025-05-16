@@ -8,7 +8,7 @@ module;
 #include <utility>
 #include <vector>
 
-module ttl:tensor;
+export module ttl:tensor;
 import :extents;
 import :evaluate;
 import :outer;

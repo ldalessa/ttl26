@@ -8,7 +8,7 @@ module;
 #include <utility>
 #include <vector>
 
-module ttl:bind;
+export module ttl:bind;
 import :concepts;
 import :expression;
 import :index;

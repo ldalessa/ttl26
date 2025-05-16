@@ -4,10 +4,11 @@ module;
 #include <concepts>
 #include <mdspan>
 #include <ranges>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
-module ttl:concepts;
+export module ttl:concepts;
 
 namespace ttl::concepts
 {

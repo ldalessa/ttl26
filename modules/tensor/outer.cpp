@@ -2,7 +2,7 @@ module;
 
 #include <type_traits>
 
-module ttl:outer;
+export module ttl:outer;
 import :index;
 import :istring;
 import :rank;

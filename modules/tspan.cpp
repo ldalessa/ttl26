@@ -32,7 +32,7 @@ export namespace ttl
         {
         }
 
-        /// Construct a tspan for a congtiguous range.
+        /// Construct a tspan for a contiguous range.
         /// @{
         template <class R>
             requires stdr::contiguous_range<R> and stdr::sized_range<R>
