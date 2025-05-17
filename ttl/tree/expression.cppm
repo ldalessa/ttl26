@@ -37,6 +37,13 @@ namespace ttl::tree
 
 	struct expression
 	{
+		/// Neither copyable nor movable, for now.
+		constexpr expression() = default;
+		constexpr expression(expression const&) = delete;
+		constexpr expression(expression&&) = delete;
+		constexpr auto operator=(expression const&) -> expression& = delete;
+		constexpr auto operator=(expression&&) -> expression& = delete;
+		
 		/// Indexing should use operator[]
 		constexpr auto operator()(this auto&&, std::integral auto...) = delete;
 
@@ -45,14 +52,17 @@ namespace ttl::tree
 			-> ARROW( FWD(self)._rebind(index(is)...) );
 
 		/// Allow scalar expressions to decay to their scalar value.
-		///
-		/// @todo This only currently (clang 18.1, gcc 14.2) works for const
-		/// uses, because compilers disagree about what it should mean:
-		/// https://godbolt.org/z/xWMKzna6W.
-		template <class T>
+		template <concepts::scalar T>
 		constexpr operator evaluate_type<T>(this T&& self) {
 			return FWD(self)[];
 		}
+
+		/// Allow scalar expressions to be assigned from an appropriate scalar
+		/// type.
+		template <concepts::scalar T, concepts::scalar U>
+		requires (not std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>)
+		constexpr auto operator=(this T& self, U&& u)
+			-> ARROW( FWD(self)[] = FWD(u) );
 
 	  protected:
 		/// Rebind an expression.
