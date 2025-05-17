@@ -15,7 +15,7 @@ namespace ttl
 	///		static contsexpr auto evaluate(T&&, std::integral auto...) -> scalar(&)
 	///
 	///		@optional
-	///		static constexpr auto rank() -> std::size_t
+	///		static constexpr auto rank() -> std::convertible_to<std::size_t>
 	///
 	///		@optional
 	///		using extents_type = ...;
