@@ -14,10 +14,15 @@ namespace ttl
 	inline constexpr struct _evaluate_fn
 	{
 		/// Evaluate a stdlib scalar type.
+		///
+		/// If T deduces as an lvalue reference (either const or non-const) this
+		/// will return the reference, otherwise if it's an rvalue reference it
+		/// will return the value.
 		template <class T>
-			requires (concepts::integral<T> or concepts::floating_point<T>)
-		static constexpr auto operator()(T&& t) ->
-			ARROW( FWD(t) );
+		requires (concepts::integral<T> or concepts::floating_point<T>)
+		static constexpr auto operator()(T&& t) -> T {
+			return t;
+		}
 
 		/// Evaluate any type that has the tensor_trait::evaluate defined.
 		template <class T, std::integral... Is>
@@ -31,7 +36,7 @@ namespace ttl
 		/// index into the outermost range, forwarding the result to a recursive
 		/// instantiation of evaluate().
 		template <class T, std::integral... Is>
-			requires (not concepts::has_evaluate_trait<T, std::size_t, Is...> and stdr::forward_range<T>)
+		requires (not concepts::has_evaluate_trait<T, std::size_t, Is...> and stdr::forward_range<T>)
 		constexpr auto operator()(this auto const& self, T&& t, std::size_t i, Is... j) ->
 			ARROW( self(*stdr::next(stdr::begin(t), i), j...) );
 
@@ -40,7 +45,7 @@ namespace ttl
 		/// This will match mdspan, but it will also match all of the expression
 		/// tree types in the tree modules.
 		template <class T, std::integral... Is>
-			requires (not concepts::has_evaluate_trait<T, Is...> and not stdr::forward_range<T>)
+		requires (not concepts::has_evaluate_trait<T, Is...> and not stdr::forward_range<T>)
 		static constexpr auto operator()(T&& t, Is... i) ->
 			ARROW( FWD(t)[i...] );
 
@@ -63,7 +68,7 @@ namespace ttl
 
 	/// Get the type of ttl::evaluate(T).
 	template <class T>
-	using evaluate_type = decltype(evaluate._check_0(std::declval<T>()));
+	using evaluate_type = decltype(evaluate._check_0(FWD(std::declval<T>())));
 
 	/// Get the scalar type for a tensor.
 	///
