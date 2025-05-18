@@ -25,18 +25,12 @@ namespace ttl::tree
 
 	template <class A, class I, class... Is>
 	requires (std::integral<I> or ... or std::integral<Is>)
+
 	bind(A&&, I, Is...) -> bind<A, (to_istring<I> + ... + to_istring<Is>)>;
 	/// @}
 
 	struct expression
 	{
-		/// Neither copyable nor movable, for now.
-		constexpr expression() = default;
-		constexpr expression(expression const&) = delete;
-		constexpr expression(expression&&) = delete;
-		constexpr auto operator=(expression const&) -> expression& = delete;
-		constexpr auto operator=(expression&&) -> expression& = delete;
-		
 		/// Indexing should use operator[]
 		constexpr auto operator()(this auto&&, std::integral auto...) = delete;
 
