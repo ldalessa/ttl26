@@ -51,8 +51,8 @@ namespace ttl::tree
 			return _outer;
 		}
 
-		constexpr auto extents() const ->
-			ARROW( select_extents<_index, _outer>(ttl::extents(_a)) );
+		constexpr auto extents() const
+			-> ARROW( select_extents<_index, _outer>(ttl::extents(_a)) );
 
 		/// Innermost evaluation just remaps indices
 		constexpr auto operator[](this auto&& self, std::integral auto... i) -> decltype(auto)
