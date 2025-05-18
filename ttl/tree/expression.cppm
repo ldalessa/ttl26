@@ -85,6 +85,14 @@ namespace ttl::tree
 			return true;
 		}();
 
+		/// Check that the bounds are inside the extents.
+		constexpr bool _check_bounds(this auto const& self, std::integral auto... i)
+		{
+			return [&]<std::size_t... n>(std::index_sequence<n...>) -> bool {
+				return ((0 <= i and std::size_t(i) < self.extents().extent(n)) && ...);
+			}(std::make_index_sequence<sizeof...(i)>());
+		}
+
 		/// Check that contracted indices have the same extents.
 		template <istring index, std::size_t... es>
 		static constexpr bool _check_contracted_extents_dynamic(std::extents<std::size_t, es...> const& extents)
