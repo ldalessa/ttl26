@@ -92,9 +92,8 @@ namespace ttl::tree
 		{
 			static_assert(sizeof...(i) == _all.size());
 			static_assert(sizeof...(j) == _index.size());
-
-			std::size_t const ind[] { std::size_t(i)... };
-			return evaluate(FWD(self)._a, ind[j]...); /// @todo[c++26] i...[j]...
+			
+			return evaluate(FWD(self)._a, i...[j]...);
 		}
 
 		template <std::size_t... j>
