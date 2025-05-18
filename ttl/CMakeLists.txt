@@ -16,7 +16,8 @@ target_sources(ttl
         tensor/rank.cppm
         tensor/tensor.cppm
         tree/bind.cppm
-        tree/expression.cppm)
+        tree/expression.cppm
+		tree/sum.cppm)
 
 target_compile_options(ttl PUBLIC
   --include=${CMAKE_CURRENT_SOURCE_DIR}/FWD.hpp
