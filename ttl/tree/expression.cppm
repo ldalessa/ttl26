@@ -21,18 +21,11 @@ namespace ttl::tree
 	struct bind;
 
 	template <class A, istring... is>
-	bind(A&, index<is>...) -> bind<A&, (istring{""} + ... + is)>;
-
-	template <class A, istring... is>
-	bind(A const&&, index<is>...) -> bind<A const, (istring{""} + ... + is)>;
+	bind(A&&, index<is>...) -> bind<A, (istring{""} + ... + is)>;
 
 	template <class A, class I, class... Is>
-		requires (std::integral<I> or ... or std::integral<Is>)
-	bind(A&, I, Is...) -> bind<A&, (to_istring<I> + ... + to_istring<Is>)>;
-
-	template <class A, class I, class... Is>
-		requires (std::integral<I> or ... or std::integral<Is>)
-	bind(A const&&, I, Is...) -> bind<A const, (to_istring<I> + ... + to_istring<Is>)>;
+	requires (std::integral<I> or ... or std::integral<Is>)
+	bind(A&&, I, Is...) -> bind<A, (to_istring<I> + ... + to_istring<Is>)>;
 	/// @}
 
 	struct expression

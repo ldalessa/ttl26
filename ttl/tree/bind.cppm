@@ -18,6 +18,8 @@ namespace ttl::tree
 		static_assert(rank<A> == _index.size());
 		static_assert(_check_contracted_extents_static<_index, extents_type<A>>);
 
+		using expression::operator=;
+		
 		using scalar_type = ttl::scalar_type<A>;
 
 		static constexpr auto _outer = _index.outer();
@@ -37,7 +39,7 @@ namespace ttl::tree
 		}
 
 		template <class I, class... Is>
-			requires (std::integral<I> or ... or std::integral<Is>)
+		requires (std::integral<I> or ... or std::integral<Is>)
 		constexpr bind(A a, I i, Is... is)
 				: bind(a, index(i), index(is)...)
 		{
@@ -133,6 +135,7 @@ namespace ttl::tree
 	}
 }
 
+using namespace ttl;
 using namespace ttl::tree;
 
 #undef DNDEBUG
@@ -141,13 +144,22 @@ static constexpr ttl::index<"i"> i;
 static constexpr ttl::index<"j"> j;
 static constexpr ttl::index<ttl::projection> p;
 
+static_assert(std::same_as<decltype(bind(1)), bind<int, "">>);
+static_assert(std::same_as<decltype(bind((int[]){1}, i)), bind<int(&)[1], "i">>);
+static_assert(std::same_as<decltype(bind(bind((int[]){1}, i), j)), bind<bind<int(&)[1], "i">, "j">>);
+
 static constexpr bool check_bind_ctad()
 {
 	int a{};
-	bind _{a};
-	bind _{std::as_const(a)};
-	bind _{std::move(a)};
-	bind _{std::move(std::as_const(a))};
+	bind a0{a};
+	bind a1{std::as_const(a)};
+	bind a2{std::move(a)};
+	bind a3{std::move(std::as_const(a))};
+
+	static_assert(std::same_as<decltype(a0), bind<int&, "">>);
+	static_assert(std::same_as<decltype(a1), bind<int const&, "">>);
+	static_assert(std::same_as<decltype(a2), bind<int, "">>);
+	static_assert(std::same_as<decltype(a3), bind<int const, "">>);
 
 	int b[3]{};
 	bind _{b, i};
@@ -242,6 +254,9 @@ static constexpr bool check_bind_extents()
 	return true;
 }
 
+template <class>
+struct print;
+
 static constexpr bool check_bind_evaluate_plain()
 {
 	{
@@ -252,6 +267,8 @@ static constexpr bool check_bind_evaluate_plain()
 		assert(0 == evaluate(A));
 		A[] = 1;
 		assert(1 == a);
+		assert(1 == A);
+		A = 2;
 	}
 
 	{
