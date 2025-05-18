@@ -59,10 +59,10 @@ namespace ttl::tree
 		/// dependency.
 		///
 		/// @note The expression type T is needed in the implementation to
-		///		  verify that the rebound indices cover the current indices, so
-		///		  it has to be declared in this form rather than using an
-		///		  abbreviated form. This is obvious when you go look at the
-		///		  implementation in bind.cppm, even if it's not obvious here.
+		///	      verify that the rebound indices cover the current indices, so
+		///	      it has to be declared in this form rather than using an
+		///	      abbreviated form. This is obvious when you go look at the
+		///	      implementation in bind.cppm, even if it's not obvious here.
 		///
 		template <concepts::expression T, istring... str>
 		constexpr auto _rebind(this T&& self, index<str>... is)
