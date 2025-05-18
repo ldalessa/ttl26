@@ -40,7 +40,8 @@ namespace ttl::tree
 
 		/// Allow scalar expressions to decay to their scalar value.
 		template <concepts::scalar T>
-		constexpr operator evaluate_type<T>(this T&& self) {
+		constexpr operator decltype(FWD(std::declval<T>())[])(this T&& self) {
+		// constexpr operator evaluate_type<T>(this T&& self) {
 			return FWD(self)[];
 		}
 

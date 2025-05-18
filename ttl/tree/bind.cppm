@@ -55,14 +55,14 @@ namespace ttl::tree
 			ARROW( select_extents<_index, _outer>(ttl::extents(_a)) );
 
 		/// Innermost evaluation just remaps indices
-		constexpr auto operator[](this auto&& self, std::integral auto... i) -> evaluate_type<A>
+		constexpr auto operator[](this auto&& self, std::integral auto... i) -> decltype(auto)
 			requires (sizeof...(i) == _all.size())
 		{
 			return FWD(self)._evaluate(imap<_all, _index>, i...);
 		}
 
 		/// Need to inject the projected indices.
-		constexpr auto operator[](this auto&& self, std::integral auto... i) -> evaluate_type<A>
+		constexpr auto operator[](this auto&& self, std::integral auto... i) -> decltype(auto)
 			requires (_inner.size() <= sizeof...(i) and sizeof...(i) < _all.size())
 		{
 			return FWD(self)._project(self._projection_map(), i...);
@@ -88,8 +88,7 @@ namespace ttl::tree
 		}
 
 		template <std::size_t... j>
-		constexpr auto _evaluate(this auto&& self, std::index_sequence<j...>, std::integral auto... i) ->
-			evaluate_type<A>
+		constexpr auto _evaluate(this auto&& self, std::index_sequence<j...>, std::integral auto... i) -> decltype(auto)
 		{
 			static_assert(sizeof...(i) == _all.size());
 			static_assert(sizeof...(j) == _index.size());
@@ -99,8 +98,7 @@ namespace ttl::tree
 		}
 
 		template <std::size_t... j>
-		constexpr auto _project(this auto&& self, std::index_sequence<j...>, std::integral auto... i) ->
-			evaluate_type<A>
+		constexpr auto _project(this auto&& self, std::index_sequence<j...>, std::integral auto... i) -> decltype(auto)
 		{
 			static_assert(sizeof...(i) == _inner.size());
 			return FWD(self)[i..., self._i[j]...];
@@ -161,6 +159,11 @@ static constexpr bool check_bind_ctad()
 	static_assert(std::same_as<decltype(a2), bind<int, "">>);
 	static_assert(std::same_as<decltype(a3), bind<int const, "">>);
 
+	static_assert(std::same_as<decltype(a0[]), int&>);
+	static_assert(std::same_as<decltype(a1[]), int const&>);
+	static_assert(std::same_as<decltype(a2[]), int&>);
+	static_assert(std::same_as<decltype(a3[]), int const&>);
+	
 	int b[3]{};
 	bind _{b, i};
 	bind _{std::as_const(b), i};
@@ -253,9 +256,6 @@ static constexpr bool check_bind_extents()
 
 	return true;
 }
-
-template <class>
-struct print;
 
 static constexpr bool check_bind_evaluate_plain()
 {
