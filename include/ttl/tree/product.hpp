@@ -30,6 +30,8 @@ namespace ttl::tree
 		static constexpr auto _map_a = imap<_inner, _outer_a>;
 		static constexpr auto _map_b = imap<_inner, _outer_b>;
 
+		static constexpr auto rank = std::integral_constant<std::size_t, _rank>();
+		
 		A _a;
 		B _b;
 
