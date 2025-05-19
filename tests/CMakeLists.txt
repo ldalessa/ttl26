@@ -5,10 +5,12 @@ add_executable(tests
   cstring.cpp
   evaluate.cpp
   extents.cpp
+  identity.cpp
   imap.cpp
   index.cpp
   istring.cpp
   multiply.cpp
+  negate.cpp
   rank.cpp
   subtract.cpp
   tensor.cpp
