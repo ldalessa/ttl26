@@ -18,5 +18,4 @@ namespace ttl::concepts
 
 	template <class T>
 	concept scalar = expression<T> and tensor_of_rank<T, 0>;
-
 }
