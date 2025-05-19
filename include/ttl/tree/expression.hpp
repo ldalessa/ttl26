@@ -71,7 +71,7 @@ namespace ttl::tree
 
 		/// Check that contracted extents are statically compatible.
 		///
-		/// Contracted extents i and j are	"statically compatible" if either
+		/// Contracted extents i and j are "statically compatible" if either
 		/// static_extent is std::dynamic range, or if the extents are equal.
 		template <istring index, class Extents>
 		static constexpr bool _check_contracted_extents_static = [] {
