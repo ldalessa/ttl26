@@ -1,83 +1,43 @@
 #pragma once
-
-#include <ttl/evaluate.hpp>
-#include <ttl/extents.hpp>
-#include <ttl/tensor.hpp>
-
-#include <concepts>
-#include <mdspan>
-#include <span>
+#include <ttl/concepts.hpp>
+import std;
 
 namespace ttl
 {
-    template <class>
-    struct tensor_traits {
-    }; // definining this produces better errors
+	/// Tensor traits allow 3rd party types to be used as tensors.
+	template <class>
+	struct tensor_traits;
+	/// {
+	///		@required
+	///		static contexpr auto extents(T&&) -> concepts::extents;
+	///
+	///		@required
+	///		static contsexpr auto evaluate(T&&, std::integral auto...) -> scalar(&)
+	///
+	///		@optional
+	///		static constexpr auto rank() -> std::convertible_to<std::size_t>
+	///
+	///		@optional
+	///		using extents_type = ...;
+	///
+	///		@optional
+	///		using scalar_type = ...;
+	/// };
+	namespace concepts
+	{
+		template <class T>
+		concept has_extents_trait = requires (T&& t) {
+			{ tensor_traits<std::decay_t<T>>::extents(FWD(t)) } -> extents;
+		};
 
-    template <class T>
-    struct tensor_traits<T const> : tensor_traits<T> {
-    };
+		template <class T, class... I>
+		concept has_evaluate_trait = requires (T&& t, I... i) {
+			tensor_traits<std::decay_t<T>>::evaluate(FWD(t), i...);
+		};
 
-    template <class T>
-        requires std::integral<T> or std::floating_point<T>
-    struct tensor_traits<T> {
-        static constexpr auto extents(T const&) -> std::extents<std::size_t>
-        {
-            return {};
-        }
-
-        static constexpr auto evaluate(T& t) -> T&
-        {
-            return t;
-        }
-
-        static constexpr auto evaluate(T const& t) -> T const&
-        {
-            return t;
-        }
-    };
-
-    template <class T, std::size_t N>
-    struct tensor_traits<std::span<T, N>> {
-        static_assert(tensor<T>, "Spans must wrap tensor types.");
-
-        using span = std::span<T, N>;
-
-        static constexpr auto extents(span s)
-        {
-            return prepend_extent<N>(ttl::extents(s[0]), s.size());
-        }
-
-        template <std::integral... J>
-        static constexpr auto evaluate(span s, std::size_t i, J... j)
-            -> decltype(ttl::evaluate(s[i], j...))
-        {
-            return ttl::evaluate(s[i], j...);
-        }
-    };
-
-    template <class T>
-        requires requires(T&& t) {
-            std::span(t);
-        }
-    struct tensor_traits<T> {
-        static constexpr auto extents(T const& t)
-        {
-            return ttl::extents(std::span(t));
-        }
-
-        template <std::integral... J>
-        static constexpr auto evaluate(T& t, std::size_t i, J... j)
-            -> decltype(ttl::evaluate(std::span(t), i, j...))
-        {
-            return ttl::evaluate(std::span(t), i, j...);
-        }
-
-        template <std::integral... J>
-        static constexpr auto evaluate(T const& t, std::size_t i, J... j)
-            -> decltype(ttl::evaluate(std::span(t), i, j...))
-        {
-            return ttl::evaluate(std::span(t), i, j...);
-        }
-    };
+		template <class T>
+		concept has_rank_trait = requires {
+			{ tensor_traits<std::decay_t<T>>::rank } -> concepts::integral_constant;
+		};
+	}
 }

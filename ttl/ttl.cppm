@@ -1,5 +1,11 @@
+module;
+#include <ttl/tensor_traits.hpp>
+#include <ttl/index/index.hpp>
 export module ttl;
-export import :istring;
-export import :index;
-export import :tensor_traits;
-export import :tspan;
+
+export
+namespace ttl
+{
+	using ttl::index;
+	using ttl::tensor_traits;
+}

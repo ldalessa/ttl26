@@ -1,120 +1,133 @@
 #pragma once
 
-#include <ttl/extents.hpp>
-#include <ttl/index.hpp>
-#include <ttl/tensor.hpp>
-#include <ttl/tree/assign.hpp>
-#include <ttl/tree/node.hpp>
-
+#include <ttl/concepts.hpp>
+#include <ttl/index/index.hpp>
+#include <ttl/index/istring.hpp>
+#include <ttl/tensor/tensor.hpp>
+#include <ttl/tree/expression.hpp>
 #include <cassert>
-#include <concepts>
-#include <cstddef>
-#include <type_traits>
-#include <utility>
+import std;
 
 namespace ttl::tree
 {
-    template <tensor A, index_string _index>
-    struct bind : node {
-        static_assert(ttl::rank<A> == _index.size());
+	namespace stdv = std::views;
 
-        static constexpr auto _outer = _index.outer();
-        static constexpr auto _inner = _index.inner();
-        static constexpr auto _all = _index.all();
-        static constexpr auto _rank = _outer.rank();
+	template <concepts::tensor A, istring _index>
+	struct bind : expression
+	{
+		static_assert(rank<A> == _index.size());
+		static_assert(_check_contracted_extents_static<_index, extents_type<A>>);
 
-        A _a;
-        ttl::index<_index> _id;
+		using expression::operator=;
+		
+		using scalar_type = ttl::scalar_type<A>;
 
-        constexpr bind(A a, ttl::index<_index> id = {})
-            : _a(a)
-            , _id(id)
-        {
-            assert(_check_contracted_extents<_index>(ttl::extents(_a)));
-        }
+		static constexpr auto _outer = _index.outer();
+		static constexpr auto _inner = _index.inner();
+		static constexpr auto _all = _index.all();
 
-        constexpr auto operator=(this auto&& a, tensor auto&& b) -> decltype(auto) {
-            return assign(__fwd(a), __fwd(b));
-        }
+		A _a;
+		index<_index> _i{};
 
-        static constexpr auto outer()
-        {
-            return _outer;
-        }
+		template <istring... indices>
+		constexpr bind(A a, index<indices>... is)
+				: _a(a)
+				, _i((index<"">{} + ... + is))
+		{
+			static_assert((istring{""} + ... + indices) == _index);
+			assert(_check_contracted_extents_dynamic<_index>(ttl::extents(_a)));
+		}
 
-        constexpr auto extents() const
-        {
-            return select_extents(index_map<_index, _outer>, ttl::extents(_a));
-        }
+		template <class I, class... Is>
+		requires (std::integral<I> or ... or std::integral<Is>)
+		constexpr bind(A a, I i, Is... is)
+				: bind(a, index(i), index(is)...)
+		{
+		}
 
-        constexpr auto operator[](this auto&& self, std::integral auto... i) -> decltype(__fwd(self)._evaluate(i...))
-        {
-            static_assert(sizeof...(i) == _rank);
-            assert(self._check_bounds(i...));
-            return __fwd(self)._evaluate(i...);
-        }
+		static constexpr auto rank = std::integral_constant<std::size_t, _outer.rank()>();
 
-    private:
-        /// This innermost evaluate implementation finally forwards to _a.
-        ///
-        /// This is called once we have enough indices, i..., to satisfy all of
-        /// the _inner extents. If this bind represents a contraction (i.e.,
-        /// some sort of trace) then we need to duplicate and potentially
-        /// shuffle some of the incoming indices.
-        ///
-        ///    int x[2][2]
-        ///    {
-        ///        {1, 0},
-        ///        {0, 2}
-        ///    };
-        ///    auto b = bind(x, ii);
-        ///    auto tr = b[]
-        //         -> b._evaluate(0) + b._evaluate(1)
-        ///        -> b._evaluate_impl(std::index_sequence<0,0>, 0) + b._evaluate(1)
-        ///        -> ttl::evaluate(b.x, 0, 0) + b._evaluate(1)
-        ///        -> 1 + b._evaluate(1)
-        ///        -> 1 + b._evaluate_impl(std::index_sequence<0,0>, 1)
-        ///        -> 1 + ttl::evaluate(b.x, 1, 1)
-        ///        -> 1 + 2
-        ///        -> 3
-        template <std::size_t... j>
-        constexpr auto _remap_indices(this auto&& self, std::index_sequence<j...>, std::integral auto... i) -> ttl::evaluate_type<A>
-        {
-            static_assert(sizeof...(i) == _all.size());
-            int const ind[] { int(i)... };
-            return ttl::evaluate(__fwd(self)._a, ind[j]...);
-            // return ttl::evaluate(__fwd(self)._a, i...[j]...); @todo[c++26]
-        }
+		static consteval auto outer() {
+			return _outer;
+		}
 
-        /// This is called to append any projected indices to the pack.  It will
-        /// forward to the _remap_indices to forward to remap the index pack to
-        /// the order expected by the _a tensor space.
-        template <std::size_t... j>
-        constexpr auto _append_projection(this auto&& self, std::index_sequence<j...>, std::integral auto... i) -> ttl::evaluate_type<A>
-        {
-            return __fwd(self)._remap_indices(index_map<_all, _index>, i..., self._id[j]...);
-        }
+		constexpr auto extents() const
+			-> ARROW( select_extents<_index, _outer>(ttl::extents(_a)) );
 
-        /// This is called when we have enough indices, i..., to satisfy the
-        /// _inner index. It will forward to the function that appends and
-        /// projected indices.
-        constexpr auto _evaluate(this auto&& self, std::integral auto... i) -> ttl::evaluate_type<A>
-            requires(sizeof...(i) == _inner.size())
-        {
-            return __fwd(self)._append_projection(self._id.projection_map(), i...);
-        }
+		/// Innermost evaluation just remaps indices
+		constexpr auto operator[](this auto&& self, std::integral auto... i) -> decltype(auto)
+			requires (sizeof...(i) == _all.size())
+		{
+			return FWD(self)._evaluate(imap<_all, _index>, i...);
+		}
 
-        /// This is called when the bind represents a contraction, and we
-        /// haven't generated enough indices for that contraction yet.
-        constexpr auto _evaluate(this auto&& self, std::integral auto... i) -> ttl::scalar_type<A>
-            requires (_rank <= sizeof...(i) and sizeof...(i) < _inner.size())
-        {
-            auto const extents = select_extents(index_map<_index, _inner>, ttl::extents(self._a));
-            accumulator_type<A> accum {};
-            for (std::size_t j = 0, e = extents.extent(sizeof...(i)); j < e; ++j) {
-                accum += self._evaluate(i..., j);
-            }
-            return accum;
-        }
-    };
+		/// Need to inject the projected indices.
+		constexpr auto operator[](this auto&& self, std::integral auto... i) -> decltype(auto)
+			requires (_inner.size() <= sizeof...(i) and sizeof...(i) < _all.size())
+		{
+			return FWD(self)._project(self._projection_map(), i...);
+		}
+
+		/// Need to contract indices.
+		constexpr auto operator[](this auto&& self, std::integral auto... i) -> scalar_type
+			requires (rank <= sizeof...(i) and sizeof...(i) < _inner.size())
+		{
+			static constexpr std::size_t N = sizeof...(i);
+			auto const contracted = select_extents<_inner, _index>(ttl::extents(self._a));
+			std::size_t const e = contracted.extent(N);
+			scalar_type accum {};
+			for (std::size_t j = 0; j < e; ++j) {
+				accum += self[i..., j];
+			}
+			return accum;
+		}
+
+	  private:
+		constexpr auto _projection_map() const {
+			return _i.projection_map();
+		}
+
+		template <std::size_t... j>
+		constexpr auto _evaluate(this auto&& self, std::index_sequence<j...>, std::integral auto... i) -> decltype(auto)
+		{
+			static_assert(sizeof...(i) == _all.size());
+			static_assert(sizeof...(j) == _index.size());
+			
+			return evaluate(FWD(self)._a, i...[j]...);
+		}
+
+		template <std::size_t... j>
+		constexpr auto _project(this auto&& self, std::index_sequence<j...>, std::integral auto... i) -> decltype(auto)
+		{
+			static_assert(sizeof...(i) == _inner.size());
+			return FWD(self)[i..., self._i[j]...];
+		}
+	};
+
+	template <concepts::expression T, istring... str>
+	constexpr auto expression::_rebind(this T&& self, index<str>... is)
+		-> decltype( bind(FWD(self), is...) )
+	{
+		// Make sure that this rebinding makes sense.
+		static constexpr istring outer = ttl::outer<T>;
+		static constexpr istring next = (istring{""} + ... + str);
+
+		// We need one index for each slot.
+		static_assert(outer.size() == next.size());
+
+		// Any non-projected index, i, that appears uncontracted in next needs
+		// to match the index in the same slot of outer.
+		static_assert([] {
+			for (auto const& [i, j] : stdv::zip(next, outer)) {
+				if (i == j) continue;			   // match
+				if (i == next.projected) continue; // projection
+				if (0 == outer.count(i)) continue; // good rebind
+				if (2 == next.count(i)) continue;  // contraction
+				return false;
+			}
+			return true;
+		}());
+
+		return bind(FWD(self), is...);
+	}
 }

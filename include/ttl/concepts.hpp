@@ -1,4 +1,5 @@
-export module ttl:concepts;
+#pragma once
+
 import std;
 
 namespace ttl::concepts

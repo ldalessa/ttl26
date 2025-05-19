@@ -1,9 +1,10 @@
-export module ttl:expression;
-export import :extents;
-export import :evaluate;
-export import :index;
-export import :istring;
-export import :tensor;
+#pragma once
+
+#include <ttl/index/index.hpp>
+#include <ttl/index/istring.hpp>
+#include <ttl/tensor/evaluate.hpp>
+#include <ttl/tensor/tensor.hpp>
+
 import std;
 
 namespace ttl::tree
@@ -17,7 +18,7 @@ namespace ttl::tree
 	/// constructor is actually available.
 	///
 	/// @{
-	template <tensor, istring>
+	template <concepts::tensor, istring>
 	struct bind;
 
 	template <class A, istring... is>

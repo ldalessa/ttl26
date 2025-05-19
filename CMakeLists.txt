@@ -8,4 +8,14 @@ set(CMAKE_CXX_MODULE_STD 1)
 project(ttl CXX)
 unset(CMAKE_CXX_FLAGS)
 
+add_library(ttl_impl INTERFACE)
+target_include_directories(ttl_impl INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+target_compile_features(ttl_impl INTERFACE cxx_std_26)
+target_compile_options(ttl_impl INTERFACE
+  --include=ttl/FWD.hpp
+  --include=ttl/ARROW.hpp)
+
+add_library(ttl::impl ALIAS ttl_impl)
+
 add_subdirectory(ttl)
+add_subdirectory(tests)

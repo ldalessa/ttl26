@@ -1,7 +1,7 @@
-export module ttl:outer;
-export import :index;
-export import :istring;
-export import :rank;
+#pragma once
+#include <ttl/index/index.hpp>
+#include <ttl/index/istring.hpp>
+#include <ttl/tensor/rank.hpp>
 import std;
 
 namespace ttl
