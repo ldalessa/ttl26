@@ -122,15 +122,4 @@ namespace ttl::tree
 			return concat_extents(a, b);
 		}
 	};
-
-	template <concepts::expression A, concepts::expression B>
-	struct mul : product<A, B, std::multiplies {}, std::plus {}> {
-		using mul::product::product;
-	};
-
-	template <concepts::expression A, concepts::expression B>
-	constexpr auto operator*(A&& a, B&& b) -> mul<A, B>
-	{
-		return mul<A, B>(FWD(a), FWD(b));
-	}
 }

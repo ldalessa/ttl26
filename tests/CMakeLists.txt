@@ -1,5 +1,6 @@
 add_executable(tests
   main.cpp
+  add.cpp
   bind.cpp
   cstring.cpp
   evaluate.cpp
@@ -7,9 +8,9 @@ add_executable(tests
   imap.cpp
   index.cpp
   istring.cpp
-  product.cpp
+  multiply.cpp
   rank.cpp
-  sum.cpp
+  subtract.cpp
   tensor.cpp
   tensor_traits.cpp
   tspan.cpp)

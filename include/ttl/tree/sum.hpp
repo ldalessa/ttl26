@@ -64,26 +64,4 @@ namespace ttl::tree
 		static constexpr auto _evaluate(auto&& x, std::index_sequence<i...>, std::integral auto... j)
 			-> ARROW( ttl::evaluate(FWD(x), j...[i]...) );
 	};
-
-	template <concepts::expression A, concepts::expression B>
-	struct add : sum<A, B, std::plus{}> {
-		using add::sum::sum;
-	};
-
-	template <concepts::expression A, concepts::expression B>
-	struct sub : sum<A, B, std::minus{}> {
-		   using sub::sum::sum;
-	};
-
-	template <concepts::expression A, concepts::expression B>
-	inline constexpr auto operator+(A&& a, B&& b) -> add<A, B>
-	{
-		   return add<A, B>(FWD(a), FWD(b));
-	}
-
-	template <concepts::expression A, concepts::expression B>
-	inline constexpr auto operator-(A&& a, B&& b) -> sub<A, B>
-	{
-		   return sub<A, B>(FWD(a), FWD(b));
-	}
 }
