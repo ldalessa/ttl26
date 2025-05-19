@@ -116,14 +116,14 @@ namespace ttl
 		};
 
 		template <class T>
-			requires concepts::extents<tensor_trait_t<T>>
+		requires concepts::extents<tensor_trait_t<T>>
 		struct impl<T>
 		{
 			using type = tensor_trait_t<T>;
 		};
 
 		template <class T>
-			requires (not concepts::extents<tensor_trait_t<T>> and concepts::extents<member_t<T>>)
+		requires (not concepts::extents<tensor_trait_t<T>> and concepts::extents<member_t<T>>)
 		struct impl<T>
 		{
 			using type = member_t<T>;
@@ -167,7 +167,7 @@ namespace ttl
 
 	/// Utilities for dealing with std::extents.
 	///@{
-
+	
 	/// Concatenate two sets of extents.
 	template <class T, std::size_t... as, class U, std::size_t... bs>
 	inline constexpr auto concat_extents(std::extents<T, as...> const& a, std::extents<U, bs...> const& b)
@@ -180,7 +180,10 @@ namespace ttl
 			b.extent(((void)bs, j++))...
 		};
 	}
-
+	
+	template <concepts::extents A, concepts::extents B>
+	using concat_extents_type = decltype(concat_extents(std::declval<A>(), std::declval<B>()));
+	
 	/// Select a subset of extents.
 	template <std::size_t... i, class T, std::size_t... ts>
 	inline constexpr auto select_extents(std::index_sequence<i...>, std::extents<T, ts...> const& t)
