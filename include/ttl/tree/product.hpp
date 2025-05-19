@@ -12,15 +12,15 @@ namespace ttl::tree
 {
 	template <concepts::expression A, concepts::expression B, auto op, auto reduce>
 	struct product : expression
-	{
+	{	
 		using scalar_type = std::invoke_result_t<decltype(op), scalar_type<A>, scalar_type<B>>;
 		using accumulator_type = std::remove_cvref_t<scalar_type>;
-
+		
 		static constexpr auto _outer_a = outer<A>;
 		static constexpr auto _outer_b = outer<B>;
 		static constexpr auto _outer_ab = _outer_a + _outer_b;
 
-		static_assert(_outer_ab.projected().size() == 0);
+		static_assert(_check_contracted_extents_static<_outer_ab, concat_extents_type<extents_type<A>, extents_type<B>>>);
 
 		static constexpr auto _outer = _outer_ab.outer();
 		static constexpr auto _inner = _outer_ab.inner();
@@ -37,7 +37,7 @@ namespace ttl::tree
 				: _a(FWD(a))
 				, _b(FWD(b))
 		{
-			assert(_check_contracted_extents<_outer_ab>(_extents_ab()));
+			assert(_check_contracted_extents_dynamic<_outer_ab>(_extents_ab()));
 		}
 
 		static constexpr auto outer() {
