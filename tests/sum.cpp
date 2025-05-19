@@ -1,10 +1,12 @@
 #undef DNDEBUG
 
+#include <ttl/tspan.hpp>
 #include <ttl/index/index.hpp>
 #include <ttl/tree/bind.hpp>
 #include <ttl/tree/sum.hpp>
 
 using namespace ttl;
+using namespace ttl::literals;
 using namespace ttl::tree;
 
 static_assert(concepts::tensor<add<int, int>>);
@@ -206,3 +208,75 @@ static_assert(test_scalar_sub());
 static_assert(test_vector_sub());
 static_assert(test_matrix_sub());
 
+
+static constexpr bool _vectors()
+{
+	static constexpr index<"i"> i;
+
+    int x[3]{1, 2, 3};
+    int y[3]{3, 2, 1};
+    auto xʹ = bind(x, i);
+    auto yʹ = bind(y, i);
+    static_assert(concepts::tensor<decltype(xʹ)>);
+    static_assert(xʹ.rank == 1);
+    static_assert(concepts::tensor<decltype(yʹ)>);
+    static_assert(yʹ.rank == 1);
+    auto z = xʹ + yʹ;
+    assert(4 == z[0]);
+    assert(4 == z[1]);
+    assert(4 == z[2]);
+
+    auto zʹ = xʹ - yʹ;
+    assert(-2 == zʹ[0]);
+    assert(0 == zʹ[1]);
+    assert(2 == zʹ[2]);
+
+    // auto q = x + bind(y, i);
+
+    auto xy = bind(x, i) + bind(y, i);
+    assert(4 == xy[0]);
+    assert(4 == xy[1]);
+    assert(4 == xy[2]);
+
+    auto s = tspan(x, 3);
+    auto t = tspan(y, 3);
+    auto st = s(i) + t(i);
+    assert(4 == st[0]);
+    assert(4 == st[1]);
+    assert(4 == st[2]);
+
+    auto st2 = s(i) + t(i) + s(i) + t(i);
+    assert(8 == st2[0]);
+    assert(8 == st2[1]);
+    assert(8 == st2[2]);
+
+    return true;
+}
+
+static constexpr bool _tensors()
+{
+	static constexpr index<"i"> i;
+	static constexpr index<"j"> j;
+
+    int v[]{0, 1, 2, 0};
+    int w[]{0, 2, 1, 0};
+    auto vʹ = tspan(v, 2, 2);
+    auto wʹ = tspan(w, 2, 2);
+    auto vwʹ = vʹ(i,j) + wʹ(j,i);
+    assert((0 == vwʹ[0,0]));
+    assert((2 == vwʹ[0,1]));
+    assert((4 == vwʹ[1,0]));
+    assert((0 == vwʹ[1,1]));
+
+    int m[]{0, 1};
+    auto n = tspan(m, 2, 1);
+    auto o = tspan(m, 1, 2);
+    auto no = n(i,j) + o(j,i);
+    assert((0 == no[0,0]));
+    assert((2 == no[1,0]));
+
+    return true;
+}
+
+static_assert(_vectors());
+static_assert(_tensors());
